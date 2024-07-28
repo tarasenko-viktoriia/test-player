@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTrack, play, pause, togglePlayPause } from './playerSlice';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
 
-function Library({ library, addTrackToPlaylist, playlists }) {
+function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
-  const [open, setOpen] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
+  const [newTrackName, setNewTrackName] = useState('');
+  const [newArtistName, setNewArtistName] = useState('');
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
@@ -21,13 +25,13 @@ function Library({ library, addTrackToPlaylist, playlists }) {
     }
   };
 
-  const handleClickOpen = (track) => {
+  const handleClickOpenAdd = (track) => {
     setSelectedTrack(track);
-    setOpen(true);
+    setOpenAdd(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
     setSelectedTrack(null);
     setSelectedPlaylist('');
   };
@@ -35,7 +39,28 @@ function Library({ library, addTrackToPlaylist, playlists }) {
   const handleAddToPlaylist = () => {
     if (selectedTrack && selectedPlaylist) {
       addTrackToPlaylist(selectedTrack, selectedPlaylist);
-      handleClose();
+      handleCloseAdd();
+    }
+  };
+
+  const handleClickOpenEdit = (track) => {
+    setSelectedTrack(track);
+    setNewTrackName(track.name);
+    setNewArtistName(track.artist);
+    setOpenEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+    setSelectedTrack(null);
+    setNewTrackName('');
+    setNewArtistName('');
+  };
+
+  const handleUpdateTrackInfo = () => {
+    if (selectedTrack) {
+      updateTrackInfo(selectedTrack.url, newTrackName, newArtistName);
+      handleCloseEdit();
     }
   };
 
@@ -63,13 +88,18 @@ function Library({ library, addTrackToPlaylist, playlists }) {
             <div>
               {currentTrack && currentTrack.url === track.url && isPlaying ? 'Pause' : 'Play'}
             </div>
-            <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpen(track); }}>
-              <AddIcon />
-            </IconButton>
+            <div>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
+                <AddIcon />
+              </IconButton>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
+                <EditIcon />
+              </IconButton>
+            </div>
           </div>
         ))}
       </ul>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={openAdd} onClose={handleCloseAdd}>
         <DialogTitle>Add to Playlist</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -88,8 +118,33 @@ function Library({ library, addTrackToPlaylist, playlists }) {
           </Select>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleCloseAdd}>Cancel</Button>
           <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openEdit} onClose={handleCloseEdit}>
+        <DialogTitle>Edit Track Info</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Track Name"
+            type="text"
+            fullWidth
+            value={newTrackName}
+            onChange={(e) => setNewTrackName(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Artist Name"
+            type="text"
+            fullWidth
+            value={newArtistName}
+            onChange={(e) => setNewArtistName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEdit}>Cancel</Button>
+          <Button onClick={handleUpdateTrackInfo} color="primary">Save</Button>
         </DialogActions>
       </Dialog>
     </div>

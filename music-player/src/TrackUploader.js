@@ -3,11 +3,10 @@ import React from 'react';
 function TrackUploader({ addTrackToLibrary }) {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
-    const trackName = prompt("Enter track name");
-    const trackArtist = prompt("Enter track artist");
+    const trackName = file.name.split('.').slice(0, -1).join('.'); // Use file name without extension
     const track = {
       name: trackName,
-      artist: trackArtist,
+      artist: 'Unknown Artist',
       url: URL.createObjectURL(file),
     };
     addTrackToLibrary(track);

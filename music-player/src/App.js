@@ -44,6 +44,15 @@ function App() {
     setPlaylistsState([...playlists, { name, tracks: [] }]);
   };
 
+  const updateTrackInfo = (url, newName, newArtist) => {
+    setLibraryState((prevLibrary) => prevLibrary.map(track => {
+      if (track.url === url) {
+        return { ...track, name: newName, artist: newArtist };
+      }
+      return track;
+    }));
+  };
+
   return (
     <Provider store={store}>
       <div className="App" style={{ display: 'flex', height: '100vh' }}>
@@ -60,7 +69,7 @@ function App() {
           {activeTab === 'library' ? (
             <>
               <TrackUploader addTrackToLibrary={addTrackToLibrary} />
-              <Library library={library} addTrackToPlaylist={addTrackToPlaylist} playlists={playlists} />
+              <Library library={library} addTrackToPlaylist={addTrackToPlaylist} updateTrackInfo={updateTrackInfo} playlists={playlists} />
             </>
           ) : (
             <Playlist playlists={playlists} createPlaylist={createPlaylist} />
