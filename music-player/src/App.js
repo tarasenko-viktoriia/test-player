@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from './store';
 import Library from './Library';
 import Playlist from './Playlist';
 import TrackUploader from './TrackUploader';
 import Player from './Player';
-import { setLibrary, setPlaylists } from './playerSlice';
+import { setLibrary, setPlaylists, setTrack } from './playerSlice';
 import './App.css'; // Импортируем стили
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
   const [playlists, setPlaylistsState] = useState([]);
   const [activeTab, setActiveTab] = useState('library');
   const dispatch = useDispatch();
+  const currentTrack = useSelector((state) => state.player.currentTrack);
 
   useEffect(() => {
     dispatch(setLibrary(library));
@@ -63,7 +64,11 @@ function App() {
   const updateTrackInfo = (url, newName, newArtist) => {
     setLibraryState((prevLibrary) => prevLibrary.map(track => {
       if (track.url === url) {
-        return { ...track, name: newName, artist: newArtist };
+        const updatedTrack = { ...track, name: newName, artist: newArtist };
+        if (currentTrack && currentTrack.url === url) {
+          dispatch(setTrack({ track: updatedTrack, index: -1, context: 'library', playlist: null }));
+        }
+        return updatedTrack;
       }
       return track;
     }));
@@ -71,7 +76,11 @@ function App() {
       ...playlist,
       tracks: playlist.tracks.map(track => {
         if (track.url === url) {
-          return { ...track, name: newName, artist: newArtist };
+          const updatedTrack = { ...track, name: newName, artist: newArtist };
+          if (currentTrack && currentTrack.url === url) {
+            dispatch(setTrack({ track: updatedTrack, index: -1, context: 'playlist', playlist: null }));
+          }
+          return updatedTrack;
         }
         return track;
       })
@@ -105,7 +114,7 @@ function App() {
               <Library library={library} addTrackToPlaylist={addTrackToPlaylist} updateTrackInfo={updateTrackInfo} deleteTrack={deleteTrack} playlists={playlists} />
             </>
           ) : (
-            <Playlist playlists={playlists} createPlaylist={createPlaylist} removeTrackFromPlaylist={removeTrackFromPlaylist} />
+            <Playlist playlists={playlists} createPlaylist={createPlaylist} removeTrackFromPlaylist={removeTrackFromPlaylist} updateTrackInfo={updateTrackInfo} />
           )}
         </div>
         <div style={{ width: '300px', borderLeft: '1px solid #ccc', padding: '10px' }}>
