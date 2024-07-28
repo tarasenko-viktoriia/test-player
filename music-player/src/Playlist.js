@@ -4,15 +4,17 @@ import { setTrack, play, pause, togglePlayPause } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, IconButton, Select, MenuItem } from '@mui/material';
 
-function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
+function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, addTrackToPlaylist, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [playlistName, setPlaylistName] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState('');
+  const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [newTrackName, setNewTrackName] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
 
@@ -33,10 +35,10 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
 
   const handleRemoveTrack = (playlistName, trackUrl) => {
     removeTrackFromPlaylist(playlistName, trackUrl);
-    setSelectedPlaylist((prevSelectedPlaylist) => ({
-      ...prevSelectedPlaylist,
-      tracks: prevSelectedPlaylist.tracks.filter((track) => track.url !== trackUrl),
-    }));
+    setSelectedPlaylist((prevSelectedPlaylist) => {
+      const updatedTracks = prevSelectedPlaylist?.tracks?.filter((track) => track.url !== trackUrl) || [];
+      return { ...prevSelectedPlaylist, tracks: updatedTracks };
+    });
   };
 
   const handleClickOpenEdit = (track) => {
@@ -60,6 +62,24 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
     }
   };
 
+  const handleClickOpenAdd = (track) => {
+    setSelectedTrack(track);
+    setOpenAdd(true);
+  };
+
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
+    setSelectedTrack(null);
+    setSelectedPlaylist('');
+  };
+
+  const handleAddToPlaylist = () => {
+    if (selectedTrack && selectedPlaylist) {
+      addTrackToPlaylist(selectedTrack, selectedPlaylist);
+      handleCloseAdd();
+    }
+  };
+
   const filteredPlaylists = playlists.map((playlist) => ({
     ...playlist,
     tracks: playlist.tracks.filter(
@@ -72,7 +92,7 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
   return (
     <div>
       <h2>Playlists</h2>
-      {!selectedPlaylist ? (
+      {!selectedPlaylistName ? (
         <>
           <input
             type="text"
@@ -85,7 +105,7 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
             {filteredPlaylists.map((playlist, index) => (
               <li
                 key={index}
-                onClick={() => setSelectedPlaylist(playlist)}
+                onClick={() => setSelectedPlaylistName(playlist.name)}
                 style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc' }}
               >
                 {playlist.name}
@@ -95,13 +115,13 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
         </>
       ) : (
         <div>
-          <button onClick={() => setSelectedPlaylist(null)}>Back to Playlists</button>
-          <h3>{selectedPlaylist.name}</h3>
+          <button onClick={() => setSelectedPlaylistName(null)}>Back to Playlists</button>
+          <h3>{selectedPlaylistName}</h3>
           <ul>
-            {selectedPlaylist.tracks.map((track, trackIndex) => (
+            {filteredPlaylists.find((playlist) => playlist.name === selectedPlaylistName)?.tracks.map((track, trackIndex) => (
               <div
                 key={trackIndex}
-                onClick={() => handlePlayPause(track, trackIndex, selectedPlaylist)}
+                onClick={() => handlePlayPause(track, trackIndex, selectedPlaylistName)}
                 style={{
                   border: '1px solid black',
                   padding: '10px',
@@ -119,11 +139,14 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
                   {currentTrack && currentTrack.url === track.url && isPlaying ? 'Pause' : 'Play'}
                 </div>
                 <div>
-                  <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.name, track.url); }}>
+                  <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylistName, track.url); }}>
                     <DeleteIcon />
                   </IconButton>
                   <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
                     <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
+                    <AddIcon />
                   </IconButton>
                 </div>
               </div>
@@ -152,6 +175,29 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
             <DialogActions>
               <Button onClick={handleCloseEdit}>Cancel</Button>
               <Button onClick={handleUpdateTrackInfo} color="primary">Save</Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={openAdd} onClose={handleCloseAdd}>
+            <DialogTitle>Add to Playlist</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Select a playlist to add the track.
+              </DialogContentText>
+              <Select
+                value={selectedPlaylist}
+                onChange={(e) => setSelectedPlaylist(e.target.value)}
+                fullWidth
+              >
+                {playlists.map((playlist, index) => (
+                  <MenuItem key={index} value={playlist.name}>
+                    {playlist.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseAdd}>Cancel</Button>
+              <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
             </DialogActions>
           </Dialog>
         </div>
