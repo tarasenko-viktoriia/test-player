@@ -67,6 +67,15 @@ function App() {
       }
       return track;
     }));
+    setPlaylistsState((prevPlaylists) => prevPlaylists.map(playlist => ({
+      ...playlist,
+      tracks: playlist.tracks.map(track => {
+        if (track.url === url) {
+          return { ...track, name: newName, artist: newArtist };
+        }
+        return track;
+      })
+    })));
   };
 
   const deleteTrack = (url) => {

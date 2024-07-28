@@ -27,6 +27,7 @@ function Player() {
       {currentTrack ? (
         <div>
           <h2>Now Playing: {currentTrack.name}</h2>
+          <h3>Artist: {currentTrack.artist}</h3>
           <button onClick={handlePlayPause}>{isPlaying ? 'Pause' : 'Play'}</button>
           <button onClick={handlePrevTrack}>Previous</button>
           <button onClick={handleNextTrack}>Next</button>
