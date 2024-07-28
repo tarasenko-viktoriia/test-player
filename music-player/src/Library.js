@@ -11,7 +11,7 @@ function Library({ library, addTrackToPlaylist, playlists }) {
       dispatch(togglePlayPause());
     } else {
       dispatch(pause());
-      dispatch(setTrack({ track, index }));
+      dispatch(setTrack({ track, index, context: 'library', playlist: null }));
       dispatch(play());
     }
   };

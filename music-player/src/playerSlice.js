@@ -5,7 +5,10 @@ const initialState = {
   isPlaying: false,
   audio: null,
   library: [],
+  playlists: [],
   currentIndex: -1,
+  currentContext: 'library', // 'library' or 'playlist'
+  currentPlaylist: null,
 };
 
 const playerSlice = createSlice({
@@ -18,7 +21,12 @@ const playerSlice = createSlice({
       }
       state.currentTrack = action.payload.track;
       state.currentIndex = action.payload.index;
+      state.currentContext = action.payload.context;
+      state.currentPlaylist = action.payload.playlist;
       state.audio = new Audio(action.payload.track.url);
+      if (state.isPlaying) {
+        state.audio.play();
+      }
     },
     play: (state) => {
       if (state.audio) {
@@ -35,10 +43,14 @@ const playerSlice = createSlice({
     setLibrary: (state, action) => {
       state.library = action.payload;
     },
+    setPlaylists: (state, action) => {
+      state.playlists = action.payload;
+    },
     nextTrack: (state) => {
-      if (state.currentIndex < state.library.length - 1) {
+      const context = state.currentContext === 'library' ? state.library : state.currentPlaylist.tracks;
+      if (state.currentIndex < context.length - 1) {
         state.currentIndex += 1;
-        state.currentTrack = state.library[state.currentIndex];
+        state.currentTrack = context[state.currentIndex];
         if (state.audio) {
           state.audio.pause();
         }
@@ -49,9 +61,10 @@ const playerSlice = createSlice({
       }
     },
     prevTrack: (state) => {
+      const context = state.currentContext === 'library' ? state.library : state.currentPlaylist.tracks;
       if (state.currentIndex > 0) {
         state.currentIndex -= 1;
-        state.currentTrack = state.library[state.currentIndex];
+        state.currentTrack = context[state.currentIndex];
         if (state.audio) {
           state.audio.pause();
         }
@@ -75,6 +88,6 @@ const playerSlice = createSlice({
   },
 });
 
-export const { setTrack, play, pause, setLibrary, nextTrack, prevTrack, togglePlayPause } = playerSlice.actions;
+export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause } = playerSlice.actions;
 
 export default playerSlice.reducer;

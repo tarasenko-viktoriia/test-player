@@ -5,23 +5,27 @@ import Library from './Library';
 import Playlist from './Playlist';
 import TrackUploader from './TrackUploader';
 import Player from './Player';
-import { setLibrary } from './playerSlice';
+import { setLibrary, setPlaylists } from './playerSlice';
 
 function App() {
   const [library, setLibraryState] = useState([]);
-  const [playlists, setPlaylists] = useState([]);
+  const [playlists, setPlaylistsState] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(setLibrary(library));
   }, [library, dispatch]);
 
+  useEffect(() => {
+    dispatch(setPlaylists(playlists));
+  }, [playlists, dispatch]);
+
   const addTrackToLibrary = (track) => {
     setLibraryState([...library, track]);
   };
 
   const addTrackToPlaylist = (track, playlistName) => {
-    setPlaylists((prevPlaylists) => {
+    setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
         if (playlist.name === playlistName) {
           return {
@@ -36,7 +40,7 @@ function App() {
   };
 
   const createPlaylist = (name) => {
-    setPlaylists([...playlists, { name, tracks: [] }]);
+    setPlaylistsState([...playlists, { name, tracks: [] }]);
   };
 
   return (

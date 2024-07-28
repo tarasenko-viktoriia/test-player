@@ -12,12 +12,12 @@ function Playlist({ playlists, createPlaylist }) {
     setPlaylistName('');
   };
 
-  const handlePlayPause = (track, index) => {
+  const handlePlayPause = (track, index, playlist) => {
     if (currentTrack && currentTrack.url === track.url) {
       dispatch(togglePlayPause());
     } else {
       dispatch(pause());
-      dispatch(setTrack({ track, index }));
+      dispatch(setTrack({ track, index, context: 'playlist', playlist }));
       dispatch(play());
     }
   };
@@ -39,7 +39,7 @@ function Playlist({ playlists, createPlaylist }) {
             {playlist.tracks.map((track, trackIndex) => (
               <div
                 key={trackIndex}
-                onClick={() => handlePlayPause(track, trackIndex)}
+                onClick={() => handlePlayPause(track, trackIndex, playlist)}
                 style={{
                   border: '1px solid black',
                   padding: '10px',
