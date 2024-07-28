@@ -6,11 +6,12 @@ import Playlist from './Playlist';
 import TrackUploader from './TrackUploader';
 import Player from './Player';
 import { setLibrary, setPlaylists } from './playerSlice';
+import './App.css'; // Импортируем стили
 
 function App() {
   const [library, setLibraryState] = useState([]);
   const [playlists, setPlaylistsState] = useState([]);
-  const [activeTab, setActiveTab] = useState('library'); // Added state for active tab
+  const [activeTab, setActiveTab] = useState('library');
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -40,6 +41,21 @@ function App() {
     });
   };
 
+  const removeTrackFromPlaylist = (playlistName, trackUrl) => {
+    setPlaylistsState((prevPlaylists) => {
+      const updatedPlaylists = prevPlaylists.map((playlist) => {
+        if (playlist.name === playlistName) {
+          return {
+            ...playlist,
+            tracks: playlist.tracks.filter((track) => track.url !== trackUrl),
+          };
+        }
+        return playlist;
+      });
+      return updatedPlaylists;
+    });
+  };
+
   const createPlaylist = (name) => {
     setPlaylistsState([...playlists, { name, tracks: [] }]);
   };
@@ -51,6 +67,10 @@ function App() {
       }
       return track;
     }));
+  };
+
+  const deleteTrack = (url) => {
+    setLibraryState((prevLibrary) => prevLibrary.filter(track => track.url !== url));
   };
 
   return (
@@ -69,10 +89,10 @@ function App() {
           {activeTab === 'library' ? (
             <>
               <TrackUploader addTrackToLibrary={addTrackToLibrary} />
-              <Library library={library} addTrackToPlaylist={addTrackToPlaylist} updateTrackInfo={updateTrackInfo} playlists={playlists} />
+              <Library library={library} addTrackToPlaylist={addTrackToPlaylist} updateTrackInfo={updateTrackInfo} deleteTrack={deleteTrack} playlists={playlists} />
             </>
           ) : (
-            <Playlist playlists={playlists} createPlaylist={createPlaylist} />
+            <Playlist playlists={playlists} createPlaylist={createPlaylist} removeTrackFromPlaylist={removeTrackFromPlaylist} />
           )}
         </div>
         <div style={{ width: '300px', borderLeft: '1px solid #ccc', padding: '10px' }}>

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTrack, play, pause, togglePlayPause } from './playerSlice';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
 
-function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists }) {
+function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, playlists }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
@@ -64,6 +65,10 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists }) {
     }
   };
 
+  const handleDeleteTrack = (trackUrl) => {
+    deleteTrack(trackUrl);
+  };
+
   return (
     <div>
       <h2>My Library</h2>
@@ -94,6 +99,9 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists }) {
               </IconButton>
               <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
                 <EditIcon />
+              </IconButton>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteTrack(track.url); }}>
+                <DeleteIcon />
               </IconButton>
             </div>
           </div>
