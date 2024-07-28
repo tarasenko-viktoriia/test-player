@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTrack, play, pause, togglePlayPause } from './playerSlice';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 function Library({ library, addTrackToPlaylist, playlists }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
+  const [open, setOpen] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState('');
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
@@ -13,6 +18,24 @@ function Library({ library, addTrackToPlaylist, playlists }) {
       dispatch(pause());
       dispatch(setTrack({ track, index, context: 'library', playlist: null }));
       dispatch(play());
+    }
+  };
+
+  const handleClickOpen = (track) => {
+    setSelectedTrack(track);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedTrack(null);
+    setSelectedPlaylist('');
+  };
+
+  const handleAddToPlaylist = () => {
+    if (selectedTrack && selectedPlaylist) {
+      addTrackToPlaylist(selectedTrack, selectedPlaylist);
+      handleClose();
     }
   };
 
@@ -28,7 +51,10 @@ function Library({ library, addTrackToPlaylist, playlists }) {
               border: '1px solid black',
               padding: '10px',
               margin: '10px 0',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
             }}
           >
             <div>
@@ -37,24 +63,35 @@ function Library({ library, addTrackToPlaylist, playlists }) {
             <div>
               {currentTrack && currentTrack.url === track.url && isPlaying ? 'Pause' : 'Play'}
             </div>
-            <button onClick={(e) => { e.stopPropagation(); addTrackToPlaylist(track, 'Default Playlist'); }}>Add to Default Playlist</button>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpen(track); }}>
+              <AddIcon />
+            </IconButton>
           </div>
         ))}
       </ul>
-      <div>
-        <h3>Add to Playlist</h3>
-        {playlists.map((playlist, index) => (
-          <div key={index}>
-            <h4>{playlist.name}</h4>
-            {library.map((track, index) => (
-              <div key={index}>
-                {track.name}
-                <button onClick={() => addTrackToPlaylist(track, playlist.name)}>Add to {playlist.name}</button>
-              </div>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Add to Playlist</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Select a playlist to add the track.
+          </DialogContentText>
+          <Select
+            value={selectedPlaylist}
+            onChange={(e) => setSelectedPlaylist(e.target.value)}
+            fullWidth
+          >
+            {playlists.map((playlist, index) => (
+              <MenuItem key={index} value={playlist.name}>
+                {playlist.name}
+              </MenuItem>
             ))}
-          </div>
-        ))}
-      </div>
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
