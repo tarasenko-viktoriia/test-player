@@ -10,6 +10,7 @@ import { setLibrary, setPlaylists } from './playerSlice';
 function App() {
   const [library, setLibraryState] = useState([]);
   const [playlists, setPlaylistsState] = useState([]);
+  const [activeTab, setActiveTab] = useState('library'); // Added state for active tab
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -45,12 +46,29 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className="App">
-        <h1>Music Player</h1>
-        <TrackUploader addTrackToLibrary={addTrackToLibrary} />
-        <Library library={library} addTrackToPlaylist={addTrackToPlaylist} playlists={playlists} />
-        <Playlist playlists={playlists} createPlaylist={createPlaylist} />
-        <Player />
+      <div className="App" style={{ display: 'flex', height: '100vh' }}>
+        <div style={{ width: '200px', borderRight: '1px solid #ccc', padding: '10px' }}>
+          <h1>Music Player</h1>
+          <div onClick={() => setActiveTab('library')} style={{ cursor: 'pointer', padding: '10px', backgroundColor: activeTab === 'library' ? '#ddd' : 'transparent' }}>
+            My Library
+          </div>
+          <div onClick={() => setActiveTab('playlists')} style={{ cursor: 'pointer', padding: '10px', backgroundColor: activeTab === 'playlists' ? '#ddd' : 'transparent' }}>
+            Playlists
+          </div>
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          {activeTab === 'library' ? (
+            <>
+              <TrackUploader addTrackToLibrary={addTrackToLibrary} />
+              <Library library={library} addTrackToPlaylist={addTrackToPlaylist} playlists={playlists} />
+            </>
+          ) : (
+            <Playlist playlists={playlists} createPlaylist={createPlaylist} />
+          )}
+        </div>
+        <div style={{ width: '300px', borderLeft: '1px solid #ccc', padding: '10px' }}>
+          <Player />
+        </div>
       </div>
     </Provider>
   );
