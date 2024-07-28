@@ -71,6 +71,10 @@ function App() {
 
   const deleteTrack = (url) => {
     setLibraryState((prevLibrary) => prevLibrary.filter(track => track.url !== url));
+    setPlaylistsState((prevPlaylists) => prevPlaylists.map(playlist => ({
+      ...playlist,
+      tracks: playlist.tracks.filter(track => track.url !== url)
+    })));
   };
 
   return (
