@@ -12,6 +12,7 @@ function App() {
   const [library, setLibraryState] = useState([]);
   const [playlists, setPlaylistsState] = useState([]);
   const [activeTab, setActiveTab] = useState('library');
+  const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
   const currentTrack = useSelector((state) => state.player.currentTrack);
 
@@ -95,6 +96,10 @@ function App() {
     })));
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <Provider store={store}>
       <div className="App" style={{ display: 'flex', height: '100vh' }}>
@@ -108,13 +113,33 @@ function App() {
           </div>
         </div>
         <div style={{ flex: 1, padding: '10px' }}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search"
+            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+          />
           {activeTab === 'library' ? (
             <>
               <TrackUploader addTrackToLibrary={addTrackToLibrary} />
-              <Library library={library} addTrackToPlaylist={addTrackToPlaylist} updateTrackInfo={updateTrackInfo} deleteTrack={deleteTrack} playlists={playlists} />
+              <Library
+                library={library}
+                addTrackToPlaylist={addTrackToPlaylist}
+                updateTrackInfo={updateTrackInfo}
+                deleteTrack={deleteTrack}
+                playlists={playlists}
+                searchQuery={searchQuery}
+              />
             </>
           ) : (
-            <Playlist playlists={playlists} createPlaylist={createPlaylist} removeTrackFromPlaylist={removeTrackFromPlaylist} updateTrackInfo={updateTrackInfo} />
+            <Playlist
+              playlists={playlists}
+              createPlaylist={createPlaylist}
+              removeTrackFromPlaylist={removeTrackFromPlaylist}
+              updateTrackInfo={updateTrackInfo}
+              searchQuery={searchQuery}
+            />
           )}
         </div>
         <div style={{ width: '300px', borderLeft: '1px solid #ccc', padding: '10px' }}>

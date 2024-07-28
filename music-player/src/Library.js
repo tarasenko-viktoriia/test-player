@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
 
-function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, playlists }) {
+function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, playlists, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
@@ -15,6 +15,11 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
   const [newTrackName, setNewTrackName] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
+
+  const filteredLibrary = library.filter((track) =>
+    track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    track.artist.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
@@ -73,7 +78,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
     <div>
       <h2>My Library</h2>
       <ul>
-        {library.map((track, index) => (
+        {filteredLibrary.map((track, index) => (
           <div
             key={index}
             onClick={() => handlePlayPause(track, index)}

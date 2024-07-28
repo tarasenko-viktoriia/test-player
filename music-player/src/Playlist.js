@@ -6,12 +6,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, IconButton } from '@mui/material';
 
-function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo }) {
+function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [playlistName, setPlaylistName] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [newTrackName, setNewTrackName] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
 
@@ -32,6 +33,10 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
 
   const handleRemoveTrack = (playlistName, trackUrl) => {
     removeTrackFromPlaylist(playlistName, trackUrl);
+    setSelectedPlaylist((prevSelectedPlaylist) => ({
+      ...prevSelectedPlaylist,
+      tracks: prevSelectedPlaylist.tracks.filter((track) => track.url !== trackUrl),
+    }));
   };
 
   const handleClickOpenEdit = (track) => {
@@ -55,24 +60,48 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
     }
   };
 
+  const filteredPlaylists = playlists.map((playlist) => ({
+    ...playlist,
+    tracks: playlist.tracks.filter(
+      (track) =>
+        track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        track.artist.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+  }));
+
   return (
     <div>
       <h2>Playlists</h2>
-      <input
-        type="text"
-        value={playlistName}
-        onChange={(e) => setPlaylistName(e.target.value)}
-        placeholder="New Playlist Name"
-      />
-      <button onClick={handleCreatePlaylist}>Create Playlist</button>
-      {playlists.map((playlist, index) => (
-        <div key={index}>
-          <h3>{playlist.name}</h3>
+      {!selectedPlaylist ? (
+        <>
+          <input
+            type="text"
+            value={playlistName}
+            onChange={(e) => setPlaylistName(e.target.value)}
+            placeholder="New Playlist Name"
+          />
+          <button onClick={handleCreatePlaylist}>Create Playlist</button>
           <ul>
-            {playlist.tracks.map((track, trackIndex) => (
+            {filteredPlaylists.map((playlist, index) => (
+              <li
+                key={index}
+                onClick={() => setSelectedPlaylist(playlist)}
+                style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc' }}
+              >
+                {playlist.name}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <div>
+          <button onClick={() => setSelectedPlaylist(null)}>Back to Playlists</button>
+          <h3>{selectedPlaylist.name}</h3>
+          <ul>
+            {selectedPlaylist.tracks.map((track, trackIndex) => (
               <div
                 key={trackIndex}
-                onClick={() => handlePlayPause(track, trackIndex, playlist)}
+                onClick={() => handlePlayPause(track, trackIndex, selectedPlaylist)}
                 style={{
                   border: '1px solid black',
                   padding: '10px',
@@ -90,7 +119,7 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
                   {currentTrack && currentTrack.url === track.url && isPlaying ? 'Pause' : 'Play'}
                 </div>
                 <div>
-                  <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(playlist.name, track.url); }}>
+                  <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.name, track.url); }}>
                     <DeleteIcon />
                   </IconButton>
                   <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
@@ -100,33 +129,33 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
               </div>
             ))}
           </ul>
+          <Dialog open={openEdit} onClose={handleCloseEdit}>
+            <DialogTitle>Edit Track Info</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                label="Track Name"
+                type="text"
+                fullWidth
+                value={newTrackName}
+                onChange={(e) => setNewTrackName(e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Artist Name"
+                type="text"
+                fullWidth
+                value={newArtistName}
+                onChange={(e) => setNewArtistName(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseEdit}>Cancel</Button>
+              <Button onClick={handleUpdateTrackInfo} color="primary">Save</Button>
+            </DialogActions>
+          </Dialog>
         </div>
-      ))}
-      <Dialog open={openEdit} onClose={handleCloseEdit}>
-        <DialogTitle>Edit Track Info</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Track Name"
-            type="text"
-            fullWidth
-            value={newTrackName}
-            onChange={(e) => setNewTrackName(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Artist Name"
-            type="text"
-            fullWidth
-            value={newArtistName}
-            onChange={(e) => setNewArtistName(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEdit}>Cancel</Button>
-          <Button onClick={handleUpdateTrackInfo} color="primary">Save</Button>
-        </DialogActions>
-      </Dialog>
+      )}
     </div>
   );
 }
