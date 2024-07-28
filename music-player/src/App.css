@@ -1,30 +1,178 @@
-.App {
+@import url(https://fonts.googleapis.com/css?family=Irish+Grover:regular&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Poppins:300,regular,500,600&display=swap);
+@import url(https://fonts.googleapis.com/css?family=DM+Sans:regular&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Urbanist:500&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Varela+Round:regular&display=swap);
+
+html, body {
+  font-size: 14px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  color: white;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+.app {
   display: flex;
-  height: 100vh;
+  flex-direction: row;
+  min-height: 100vh;
 }
 
-.sidebar {
-  width: 200px;
-  border-right: 1px solid #ccc;
-  padding: 10px;
+.sidebar-wrapper-left, .main-container, .sidebar-wrapper-right {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.content {
-  flex: 1;
-  padding: 10px;
+.sidebar-wrapper-left, .sidebar-wrapper-right {
+  width: 20%;
+  background: radial-gradient(circle at 50% 50%, rgba(28, 15, 50, 1) 20%, rgb(21, 11, 34) 50%);
 }
 
-.player {
-  width: 300px;
-  border-left: 1px solid #ccc;
-  padding: 10px;
+.sidebar-wrapper-left {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  overflow-y: auto;
 }
 
-.tab {
+.sidebar-wrapper-right {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.sidebar-left, .sidebar-right {
+  flex-grow: 1;
+  background: linear-gradient(135deg, 
+  rgba(130, 107, 158, 0.5) 0%, 
+  rgba(130, 107, 158, 0.5) 20%, 
+  rgba(46, 38, 56, 0.712) 80%, 
+  rgba(46, 38, 56, 0.712) 100%);
+  padding: 20px 0;
+}
+
+.sidebar-wrapper-left .sidebar-left {
+  border-radius: 0 20px 20px 0;
+}
+
+.sidebar-wrapper-right .sidebar-right {
+  border-radius: 20px 0 0 20px;
+}
+
+.sidebar-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.main-container {
+  margin-left: 300px; 
+  margin-right: 300px; 
+  padding: 20px; 
+  overflow-y: auto;
+  width: 60%;
+  background: radial-gradient(circle at 50% 50%, rgba(28, 15, 50, 1) 20%, rgb(21, 11, 34) 50%);
+}
+
+.hero-container {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  flex-direction: column;
+  overflow: hidden;
+  padding: 25px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.search-input {
+  font-family: "DM Sans";
+  font-size: 18px;
+  border-radius: 32px;
+  border: none;
+  width: 100%;
+  padding: 10px 25px;
+  background-color: #352E38;
+  color: #8A7BAA;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 10px rgb(255 255 255);
+}
+
+/* Track */
+.track-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.track {
   cursor: pointer;
   padding: 10px;
+  display: flex;
+  align-items: center; /* Вирівнювання по вертикалі */
+  justify-content: space-between;
+  box-shadow: 0px 0px 6px 0px rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease-in-out;
+  border-radius: 30px;
+  font-family: "Poppins";
 }
 
-.tab.active {
-  background-color: #ddd;
+.play-pause-button {
+  display: flex;
+  align-items: center; /* Вирівнювання по вертикалі */
+  justify-content: center; /* Вирівнювання по горизонталі */
+  margin-right: 10px; /* Відступ праворуч */
+}
+
+.track-info {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.track-controls {
+  display: flex;
+  align-items: center; /* Вирівнювання по вертикалі */
+  gap: 10px;
+}
+
+.track.playing {
+  background: linear-gradient(135deg, rgba(130, 107, 158, 0.5) 0%, rgba(130, 107, 158, 0.5) 20%, rgba(46, 38, 56, 0.712) 80%, rgba(46, 38, 56, 0.712) 100%);
+  border: none;
+  box-shadow: 0px 0px 10px 3px rgba(255, 255, 255, 0.3);
+}
+
+.icon-button {
+  color: white;
+}
+
+/* dropzone */
+.dropzone{
+  background-color: rgba(147, 128, 173, 0.637);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 10px 5px 0 5px;
+  text-align: center;
+  color: white;
+  font-family: "Poppins";
+  font-weight: 500;
 }

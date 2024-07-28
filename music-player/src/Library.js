@@ -4,6 +4,8 @@ import { setTrack, play, pause, togglePlayPause } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
 
 function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, playlists, searchQuery }) {
@@ -75,43 +77,32 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
   };
 
   return (
-    <div>
-      <h2>My Library</h2>
-      <ul>
-        {filteredLibrary.map((track, index) => (
-          <div
-            key={index}
-            onClick={() => handlePlayPause(track, index)}
-            style={{
-              border: '1px solid black',
-              padding: '10px',
-              margin: '10px 0',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            <div>
-              <strong>{track.name}</strong> by {track.artist}
-            </div>
-            <div>
-              {currentTrack && currentTrack.url === track.url && isPlaying ? 'Pause' : 'Play'}
-            </div>
-            <div>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
-                <AddIcon />
-              </IconButton>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
-                <EditIcon />
-              </IconButton>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteTrack(track.url); }}>
-                <DeleteIcon />
-              </IconButton>
-            </div>
+    <div className='track-container'>
+      {filteredLibrary.map((track, index) => (
+        <div 
+          className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`} 
+          key={index} 
+          onClick={() => handlePlayPause(track, index)}
+        >
+          <span className='play-pause-button'>
+            {currentTrack && currentTrack.url === track.url && isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
+          </span>
+          <div className='track-info'>
+            <strong>{track.name}</strong> by {track.artist}
           </div>
-        ))}
-      </ul>
+          <div className='track-controls'>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
+              <AddIcon className='icon-button' />
+            </IconButton>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
+              <EditIcon className='icon-button'/>
+            </IconButton>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteTrack(track.url); }}>
+              <DeleteIcon className='icon-button'/>
+            </IconButton>
+          </div>
+        </div>
+      ))}
       <Dialog open={openAdd} onClose={handleCloseAdd}>
         <DialogTitle>Add to Playlist</DialogTitle>
         <DialogContent>

@@ -6,7 +6,7 @@ import Playlist from './Playlist';
 import TrackUploader from './TrackUploader';
 import Player from './Player';
 import { setLibrary, setPlaylists, setTrack } from './playerSlice';
-import './App.css'; // Импортируем стили
+import './App.css';
 
 function App() {
   const [library, setLibraryState] = useState([]);
@@ -102,48 +102,57 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className="App" style={{ display: 'flex', height: '100vh' }}>
-        <div style={{ width: '200px', borderRight: '1px solid #ccc', padding: '10px' }}>
-          <h1>Music Player</h1>
-          <div onClick={() => setActiveTab('library')} style={{ cursor: 'pointer', padding: '10px', backgroundColor: activeTab === 'library' ? '#ddd' : 'transparent' }}>
-            My Library
-          </div>
-          <div onClick={() => setActiveTab('playlists')} style={{ cursor: 'pointer', padding: '10px', backgroundColor: activeTab === 'playlists' ? '#ddd' : 'transparent' }}>
-            Playlists
+      <div className="app">
+        <div className="sidebar-wrapper-left">
+          <div className='sidebar-left'>
+            <img src="../logo.png" alt="Logo"></img>
+            <p>Bits</p>
+            <div onClick={() => setActiveTab('library')}>
+              My Library
+            </div>
+            <div onClick={() => setActiveTab('playlists')}>
+              Playlists
+            </div>
           </div>
         </div>
-        <div style={{ flex: 1, padding: '10px' }}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search"
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-          {activeTab === 'library' ? (
-            <>
-              <TrackUploader addTrackToLibrary={addTrackToLibrary} />
-              <Library
-                library={library}
-                addTrackToPlaylist={addTrackToPlaylist}
-                updateTrackInfo={updateTrackInfo}
-                deleteTrack={deleteTrack}
+        <div className="main-container">
+          <div className="hero-container">
+            <div className="input-container">
+              <input
+                className="search-input"
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search"
+              />
+            </div>
+            {activeTab === 'library' ? (
+              <>
+                <Library
+                  library={library}
+                  addTrackToPlaylist={addTrackToPlaylist}
+                  updateTrackInfo={updateTrackInfo}
+                  deleteTrack={deleteTrack}
+                  playlists={playlists}
+                  searchQuery={searchQuery}
+                />
+              </>
+            ) : (
+              <Playlist
                 playlists={playlists}
+                createPlaylist={createPlaylist}
+                removeTrackFromPlaylist={removeTrackFromPlaylist}
+                updateTrackInfo={updateTrackInfo}
                 searchQuery={searchQuery}
               />
-            </>
-          ) : (
-            <Playlist
-              playlists={playlists}
-              createPlaylist={createPlaylist}
-              removeTrackFromPlaylist={removeTrackFromPlaylist}
-              updateTrackInfo={updateTrackInfo}
-              searchQuery={searchQuery}
-            />
-          )}
+            )}
+          </div>
         </div>
-        <div style={{ width: '300px', borderLeft: '1px solid #ccc', padding: '10px' }}>
-          <Player />
+        <div className="sidebar-wrapper-right">
+          <div className='sidebar-right'>
+            <Player />
+            <TrackUploader className="dropzone" addTrackToLibrary={addTrackToLibrary} />
+          </div>
         </div>
       </div>
     </Provider>
