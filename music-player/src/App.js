@@ -138,7 +138,6 @@ function App() {
               createPlaylist={createPlaylist}
               removeTrackFromPlaylist={removeTrackFromPlaylist}
               updateTrackInfo={updateTrackInfo}
-              addTrackToPlaylist={addTrackToPlaylist}
               searchQuery={searchQuery}
             />
           )}
