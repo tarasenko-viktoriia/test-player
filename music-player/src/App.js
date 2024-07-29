@@ -6,6 +6,7 @@ import Playlist from './Playlist';
 import TrackUploader from './TrackUploader';
 import Player from './Player';
 import { setLibrary, setPlaylists, setTrack } from './playerSlice';
+import Login from './Login';
 import './App.css';
 
 function App() {
@@ -154,6 +155,7 @@ function App() {
         </div>
         <div className="sidebar-wrapper-right">
           <div className='sidebar-right'>
+            <Login/>
             <Player />
             <TrackUploader className="dropzone" addTrackToLibrary={addTrackToLibrary} />
           </div>
