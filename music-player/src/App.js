@@ -67,6 +67,15 @@ function App() {
     setPlaylistsState(playlists.filter(playlist => playlist.name !== playlistName));
   };
 
+  const updatePlaylistName = (oldName, newName) => {
+    setPlaylistsState(playlists.map(playlist => {
+      if (playlist.name === oldName) {
+        return { ...playlist, name: newName };
+      }
+      return playlist;
+    }));
+  };
+
   const updateTrackInfo = (url, newName, newArtist) => {
     setLibraryState((prevLibrary) => prevLibrary.map(track => {
       if (track.url === url) {
@@ -154,6 +163,7 @@ function App() {
                 updateTrackInfo={updateTrackInfo}
                 searchQuery={searchQuery}
                 deletePlaylist={deletePlaylist} // Передаем функцию удаления плейлиста
+                updatePlaylistName={updatePlaylistName} // Передаем функцию изменения названия плейлиста
               />
             )}
           </div>
