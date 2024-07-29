@@ -10,6 +10,7 @@ const initialState = {
   currentContext: 'library', // 'library' or 'playlist'
   currentPlaylist: null,
   trackProgress: 0, // добавлено состояние для отслеживания прогресса трека
+  isShuffle: false, // добавлено состояние для режима случайного воспроизведения
 };
 
 const playerSlice = createSlice({
@@ -49,16 +50,20 @@ const playerSlice = createSlice({
     },
     nextTrack: (state) => {
       const context = state.currentContext === 'library' ? state.library : state.currentPlaylist.tracks;
-      if (state.currentIndex < context.length - 1) {
-        state.currentIndex += 1;
-        state.currentTrack = context[state.currentIndex];
-        if (state.audio) {
-          state.audio.pause();
+      if (state.isShuffle) {
+        state.currentIndex = Math.floor(Math.random() * context.length);
+      } else {
+        if (state.currentIndex < context.length - 1) {
+          state.currentIndex += 1;
         }
-        state.audio = new Audio(state.currentTrack.url);
-        if (state.isPlaying) {
-          state.audio.play();
-        }
+      }
+      state.currentTrack = context[state.currentIndex];
+      if (state.audio) {
+        state.audio.pause();
+      }
+      state.audio = new Audio(state.currentTrack.url);
+      if (state.isPlaying) {
+        state.audio.play();
       }
     },
     prevTrack: (state) => {
@@ -92,9 +97,15 @@ const playerSlice = createSlice({
         state.audio.currentTime = action.payload;
       }
     },
+    toggleShuffle: (state) => {
+      state.isShuffle = !state.isShuffle;
+    },
+    setNormalMode: (state) => {
+      state.isShuffle = false;
+    },
   },
 });
 
-export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause, setTrackProgress } = playerSlice.actions;
+export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause, setTrackProgress, toggleShuffle, setNormalMode } = playerSlice.actions;
 
 export default playerSlice.reducer;

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { play, pause, nextTrack, prevTrack,setTrackProgress } from './playerSlice';
+import { play, pause, nextTrack, prevTrack, setTrackProgress, toggleShuffle, setNormalMode } from './playerSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 function Player() {
   const dispatch = useDispatch();
-  const { currentTrack, isPlaying, audio } = useSelector((state) => state.player);
+  const { currentTrack, isPlaying, audio, isShuffle } = useSelector((state) => state.player);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
 
   useEffect(() => {
     if (audio) {
@@ -52,12 +56,25 @@ function Player() {
     dispatch(setTrackProgress(newTime));
   };
 
+  const handleVolumeChange = (e) => {
+    const newVolume = e.target.value;
+    audio.volume = newVolume;
+    setVolume(newVolume);
+  };
+
+  const handleShuffleToggle = () => {
+    dispatch(toggleShuffle());
+  };
+
+  const handleNormalMode = () => {
+    dispatch(setNormalMode());
+  };
+
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
-
 
   return (
     <div>
@@ -65,9 +82,11 @@ function Player() {
         <div>
           <h2>Now Playing: {currentTrack.name}</h2>
           <h3>Artist: {currentTrack.artist}</h3>
-          <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}</div>
-          <ArrowBackIosIcon onClick={handlePrevTrack}/>
-          <ArrowForwardIosIcon onClick={handleNextTrack}/>
+          <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon /> : <PlayArrowIcon />}</div>
+          <ArrowBackIosIcon onClick={handlePrevTrack} />
+          <ArrowForwardIosIcon onClick={handleNextTrack} />
+          <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'blue' : 'black' }} />
+          <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'blue' : 'black' }} />
           <span>{formatTime(currentTime)}</span>
           <input
             type="range"
@@ -78,12 +97,25 @@ function Player() {
             style={{ width: '80%' }}
           />
           <span>{formatTime(duration)}</span>
-     </div>
- ) : (
-   <h2>No track selected</h2>
- )}
-</div>
-);
+          <div>
+            <label htmlFor="volume"><VolumeUpIcon /></label>
+            <input
+              type="range"
+              id="volume"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+              style={{ width: '80%' }}
+            />
+          </div>
+        </div>
+      ) : (
+        <h2>No track selected</h2>
+      )}
+    </div>
+  );
 }
 
 export default Player;
