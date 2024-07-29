@@ -9,6 +9,7 @@ const initialState = {
   currentIndex: -1,
   currentContext: 'library', // 'library' or 'playlist'
   currentPlaylist: null,
+  trackProgress: 0, // добавлено состояние для отслеживания прогресса трека
 };
 
 const playerSlice = createSlice({
@@ -85,9 +86,15 @@ const playerSlice = createSlice({
         }
       }
     },
+    setTrackProgress: (state, action) => {
+      state.trackProgress = action.payload;
+      if (state.audio) {
+        state.audio.currentTime = action.payload;
+      }
+    },
   },
 });
 
-export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause } = playerSlice.actions;
+export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause, setTrackProgress } = playerSlice.actions;
 
 export default playerSlice.reducer;
