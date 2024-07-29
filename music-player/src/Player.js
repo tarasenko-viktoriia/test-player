@@ -79,24 +79,28 @@ function Player() {
   return (
     <div>
       {currentTrack ? (
-        <div>
-          <h2>Now Playing: {currentTrack.name}</h2>
-          <h3>Artist: {currentTrack.artist}</h3>
-          <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon /> : <PlayArrowIcon />}</div>
-          <ArrowBackIosIcon onClick={handlePrevTrack} />
-          <ArrowForwardIosIcon onClick={handleNextTrack} />
-          <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'blue' : 'black' }} />
-          <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'blue' : 'black' }} />
-          <span>{formatTime(currentTime)}</span>
-          <input
-            type="range"
-            min="0"
-            max={duration}
-            value={currentTime}
-            onChange={handleProgressChange}
-            style={{ width: '80%' }}
-          />
-          <span>{formatTime(duration)}</span>
+        <div className='player'>
+          <h2> {currentTrack.name}</h2>
+          <h3> {currentTrack.artist}</h3>
+          <div>
+            <span>{formatTime(currentTime)}</span>
+            <input
+              className='input-duration'
+              type="range"
+              min="0"
+              max={duration}
+              value={currentTime}
+              onChange={handleProgressChange}
+            />
+            <span>{formatTime(duration)}</span>
+          </div>
+          <div className='player-control'>
+            <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'blue' : 'black' }} />
+            <ArrowBackIosIcon onClick={handlePrevTrack} />
+            <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon /> : <PlayArrowIcon />}</div>
+            <ArrowForwardIosIcon onClick={handleNextTrack} />
+            <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'blue' : 'black' }} />
+          </div>
           <div>
             <label htmlFor="volume"><VolumeUpIcon /></label>
             <input
