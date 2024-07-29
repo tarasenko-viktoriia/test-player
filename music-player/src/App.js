@@ -105,13 +105,17 @@ function App() {
       <div className="app">
         <div className="sidebar-wrapper-left">
           <div className='sidebar-left'>
-            <img src="../logo.png" alt="Logo"></img>
-            <p>Bits</p>
-            <div onClick={() => setActiveTab('library')}>
-              My Library
+            <div className='logo-container'>
+              <img src="../logo.png" alt="Logo"></img>
+              <p>Bits</p>
             </div>
-            <div onClick={() => setActiveTab('playlists')}>
-              Playlists
+            <div className='sidebar-left-item' onClick={() => setActiveTab('library')}>
+              <img src="./image/music.png" alt="Frame 1" />
+                My Library
+            </div>
+            <div className='sidebar-left-item' onClick={() => setActiveTab('playlists')}>
+              <img src="./image/playlist.png" alt="Frame 2" />
+                Playlists
             </div>
           </div>
         </div>

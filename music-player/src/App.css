@@ -74,6 +74,29 @@ a {
   justify-content: space-between;
 }
 
+.logo-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Irish Grover', Courier, monospace;
+  font-size: 55px;
+}
+.logo-container p {
+  margin: 0;
+}
+.sidebar-left-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Poppins";
+  font-weight: 500;
+  color: white;
+  font-size: 18px;
+  text-transform: none;
+  padding: 0;
+  cursor: pointer;
+}
+
 .main-container {
   margin-left: 300px; 
   margin-right: 300px; 
