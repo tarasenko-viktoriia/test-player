@@ -4,6 +4,7 @@ import { setTrack, play, pause, togglePlayPause } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, IconButton } from '@mui/material';
 
 function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
@@ -71,7 +72,6 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
 
   return (
     <div>
-      <h2>Playlists</h2>
       {!selectedPlaylist ? (
         <>
           <input
@@ -95,7 +95,7 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
         </>
       ) : (
         <div>
-          <button onClick={() => setSelectedPlaylist(null)}>Back to Playlists</button>
+          <ArrowBackIcon onClick={() => setSelectedPlaylist(null)}/>
           <h3>{selectedPlaylist.name}</h3>
           <ul>
             {selectedPlaylist.tracks.map((track, trackIndex) => (

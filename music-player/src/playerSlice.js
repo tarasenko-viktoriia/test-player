@@ -53,9 +53,7 @@ const playerSlice = createSlice({
       if (state.isShuffle) {
         state.currentIndex = Math.floor(Math.random() * context.length);
       } else {
-        if (state.currentIndex < context.length - 1) {
-          state.currentIndex += 1;
-        }
+        state.currentIndex = (state.currentIndex + 1) % context.length;
       }
       state.currentTrack = context[state.currentIndex];
       if (state.audio) {
@@ -70,14 +68,16 @@ const playerSlice = createSlice({
       const context = state.currentContext === 'library' ? state.library : state.currentPlaylist.tracks;
       if (state.currentIndex > 0) {
         state.currentIndex -= 1;
-        state.currentTrack = context[state.currentIndex];
-        if (state.audio) {
-          state.audio.pause();
-        }
-        state.audio = new Audio(state.currentTrack.url);
-        if (state.isPlaying) {
-          state.audio.play();
-        }
+      } else {
+        state.currentIndex = context.length - 1;
+      }
+      state.currentTrack = context[state.currentIndex];
+      if (state.audio) {
+        state.audio.pause();
+      }
+      state.audio = new Audio(state.currentTrack.url);
+      if (state.isPlaying) {
+        state.audio.play();
       }
     },
     togglePlayPause: (state) => {
