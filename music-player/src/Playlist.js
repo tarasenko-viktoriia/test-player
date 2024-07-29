@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, IconButton } from '@mui/material';
 
-function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
+function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery, deletePlaylist }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [playlistName, setPlaylistName] = useState('');
@@ -20,6 +20,11 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
   const handleCreatePlaylist = () => {
     createPlaylist(playlistName);
     setPlaylistName('');
+  };
+
+  const handleDeletePlaylist = (playlistName) => {
+    deletePlaylist(playlistName);
+    setSelectedPlaylist(null);
   };
 
   const handlePlayPause = (track, index, playlist) => {
@@ -85,10 +90,14 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
             {filteredPlaylists.map((playlist, index) => (
               <li
                 key={index}
-                onClick={() => setSelectedPlaylist(playlist)}
-                style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc' }}
+                style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
-                {playlist.name}
+                <div onClick={() => setSelectedPlaylist(playlist)}>
+                  {playlist.name}
+                </div>
+                <IconButton onClick={() => handleDeletePlaylist(playlist.name)}>
+                  <DeleteIcon />
+                </IconButton>
               </li>
             ))}
           </ul>

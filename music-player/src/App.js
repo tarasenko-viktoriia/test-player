@@ -63,6 +63,10 @@ function App() {
     setPlaylistsState([...playlists, { name, tracks: [] }]);
   };
 
+  const deletePlaylist = (playlistName) => {
+    setPlaylistsState(playlists.filter(playlist => playlist.name !== playlistName));
+  };
+
   const updateTrackInfo = (url, newName, newArtist) => {
     setLibraryState((prevLibrary) => prevLibrary.map(track => {
       if (track.url === url) {
@@ -149,6 +153,7 @@ function App() {
                 removeTrackFromPlaylist={removeTrackFromPlaylist}
                 updateTrackInfo={updateTrackInfo}
                 searchQuery={searchQuery}
+                deletePlaylist={deletePlaylist} // Передаем функцию удаления плейлиста
               />
             )}
           </div>
