@@ -15,6 +15,7 @@ function Player() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [showVolumeControl, setShowVolumeControl] = useState(false);
 
   useEffect(() => {
     if (audio) {
@@ -76,13 +77,42 @@ function Player() {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  const toggleVolumeControl = () => {
+    setShowVolumeControl(!showVolumeControl);
+};
+
   return (
     <div>
       {currentTrack ? (
         <div className='player'>
+          <div className={`equalizer ${isPlaying ? 'playing' : ''}`}>
+              <div className="bar bar1"></div>
+              <div className="bar bar2"></div>
+              <div className="bar bar3"></div>
+              <div className="bar bar4"></div>
+              <div className="bar bar5"></div>
+          </div>
           <h2> {currentTrack.name}</h2>
           <h3> {currentTrack.artist}</h3>
-          <div>
+          <div className="player-controls-container">
+            <div className="volume-control-wrapper">
+              <div className="player-controls volume-button" onClick={toggleVolumeControl}>
+                <VolumeUpIcon />
+              </div>
+              {showVolumeControl && (
+                <div className="volume-control">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="vertical-slider"
+                  />
+                </div>
+              )}
+            </div>
             <span>{formatTime(currentTime)}</span>
             <input
               className='input-duration'
@@ -100,19 +130,6 @@ function Player() {
             <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon /> : <PlayArrowIcon />}</div>
             <ArrowForwardIosIcon onClick={handleNextTrack} />
             <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'blue' : 'black' }} />
-          </div>
-          <div>
-            <label htmlFor="volume"><VolumeUpIcon /></label>
-            <input
-              type="range"
-              id="volume"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={handleVolumeChange}
-              style={{ width: '80%' }}
-            />
           </div>
         </div>
       ) : (
