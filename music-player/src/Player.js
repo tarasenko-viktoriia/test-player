@@ -85,12 +85,8 @@ function Player() {
     <div>
       {currentTrack ? (
         <div className='player'>
-          <div className={`equalizer ${isPlaying ? 'playing' : ''}`}>
-              <div className="bar bar1"></div>
-              <div className="bar bar2"></div>
-              <div className="bar bar3"></div>
-              <div className="bar bar4"></div>
-              <div className="bar bar5"></div>
+          <div >
+            <img className={isPlaying ? 'spin' : ''} src='../image/player-image.png' width="100px"></img>
           </div>
           <h2> {currentTrack.name}</h2>
           <h3> {currentTrack.artist}</h3>
@@ -125,11 +121,11 @@ function Player() {
             <span>{formatTime(duration)}</span>
           </div>
           <div className='player-control'>
-            <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'blue' : 'black' }} />
+            <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'white': ' #8A7BAA'  }} />
             <ArrowBackIosIcon onClick={handlePrevTrack} />
             <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon /> : <PlayArrowIcon />}</div>
             <ArrowForwardIosIcon onClick={handleNextTrack} />
-            <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'blue' : 'black' }} />
+            <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'white': ' #8A7BAA'  }} />
           </div>
         </div>
       ) : (
