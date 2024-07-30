@@ -72,6 +72,7 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 15px;
 }
 
 .logo-container{
@@ -215,11 +216,21 @@ a {
   border-radius: 20px;
   padding: 15px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.track-id3 {
+  text-align: center; 
+  width: 75%; 
 }
 
 .player-controls-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 .player h2 {
@@ -279,7 +290,7 @@ a {
 .volume-control-wrapper {
   display: flex;
   align-items: center;
-  gap: 5px; /* Відстань між кнопкою і повзунком звуку */
+  gap: 5px; 
   position: relative;
   display: inline-block;
 }
@@ -291,7 +302,7 @@ a {
 
 .volume-control {
   position: absolute;
-  bottom: 70px; 
+  bottom: 60px; 
   left: 50%;
   transform: translateX(-50%);
   display: flex;

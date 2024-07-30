@@ -88,8 +88,10 @@ function Player() {
           <div >
             <img className={isPlaying ? 'spin' : ''} src='../image/player-image.png' width="100px"></img>
           </div>
-          <h2> {currentTrack.name}</h2>
-          <h3> {currentTrack.artist}</h3>
+          <div className='track-id3'>
+            <h2> {currentTrack.name}</h2>
+            <h3> {currentTrack.artist}</h3>
+          </div>
           <div className="player-controls-container">
             <div className="volume-control-wrapper">
               <div className="player-controls volume-button" onClick={toggleVolumeControl}>
