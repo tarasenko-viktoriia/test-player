@@ -5,7 +5,9 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, IconButton } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
 
 function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery, deletePlaylist, updatePlaylistName }) {
   const dispatch = useDispatch();
@@ -18,10 +20,12 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [newTrackName, setNewTrackName] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
   const handleCreatePlaylist = () => {
     createPlaylist(playlistName);
     setPlaylistName('');
+    setOpenCreateDialog(false);
   };
 
   const handleDeletePlaylist = (playlistName) => {
@@ -97,71 +101,74 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
   }));
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       {!selectedPlaylist ? (
         <>
-          <input
-            type="text"
-            value={playlistName}
-            onChange={(e) => setPlaylistName(e.target.value)}
-            placeholder="New Playlist Name"
-          />
-          <button onClick={handleCreatePlaylist}>Create Playlist</button>
-          <ul>
-            {filteredPlaylists.map((playlist, index) => (
-              <li
-                key={index}
-                style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-              >
-                <div onClick={() => setSelectedPlaylist(playlist)}>
-                  {playlist.name}
-                </div>
-                <IconButton onClick={() => handleOpenEditPlaylistName(playlist)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => handleDeletePlaylist(playlist.name)}>
-                  <DeleteIcon />
-                </IconButton>
-              </li>
-            ))}
-          </ul>
+          <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+              <IconButton onClick={() => setOpenCreateDialog(true)}>
+                <AddIcon style={{ color: 'white', width: '40px', height: '40px' }} />
+              </IconButton>
+          </div>
+          {filteredPlaylists.map((playlist, index) => (
+            <div className='playlist' key={index} onClick={() => setSelectedPlaylist(playlist)}>
+            <div>
+              {playlist.name}
+            </div>
+            <div className='track-controls'>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEditPlaylistName(playlist); }}>
+                <EditIcon style={{ color: 'white' }} />
+              </IconButton>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.name); }}>
+                <DeleteIcon style={{ color: 'white' }} />
+              </IconButton>
+            </div>
+          </div>
+          ))}
+
+          <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
+            <DialogTitle>Create New Playlist</DialogTitle>
+            <DialogContent>
+              <TextField
+                margin="dense"
+                label="New Playlist Name"
+                type="text"
+                fullWidth
+                value={playlistName}
+                onChange={(e) => setPlaylistName(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenCreateDialog(false)}>Cancel</Button>
+              <Button onClick={handleCreatePlaylist} color="primary">Create</Button>
+            </DialogActions>
+          </Dialog>
         </>
       ) : (
-        <div>
-          <ArrowBackIcon onClick={() => setSelectedPlaylist(null)}/>
+        <div className='playlist-container'>
+          <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
           <h3>{selectedPlaylist.name}</h3>
-          <ul>
-            {selectedPlaylist.tracks.map((track, trackIndex) => (
-              <div
-                key={trackIndex}
-                onClick={() => handlePlayPause(track, trackIndex, selectedPlaylist)}
-                style={{
-                  border: '1px solid black',
-                  padding: '10px',
-                  margin: '10px 0',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                <div>
-                  <strong>{track.name}</strong> by {track.artist}
-                </div>
-                <div>
-                  {currentTrack && currentTrack.url === track.url && isPlaying ? 'Pause' : 'Play'}
-                </div>
-                <div>
-                  <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.name, track.url); }}>
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
-                    <EditIcon />
-                  </IconButton>
-                </div>
+          {selectedPlaylist.tracks.map((track, trackIndex) => (
+            <div className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`}
+              key={trackIndex}
+              onClick={() => handlePlayPause(track, trackIndex, selectedPlaylist)}
+            >
+              <span className='play-pause-button'>
+                {currentTrack && currentTrack.url === track.url && isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+              </span>
+              <div className='track-info'>
+                <strong>{track.name}</strong> by {track.artist}
               </div>
-            ))}
-          </ul>
+              <div className='track-controls'>
+                <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.name, track.url); }}>
+                  <DeleteIcon style={{ color: 'white' }} />
+                </IconButton>
+                <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
+                  <EditIcon style={{ color: 'white' }} />
+                </IconButton>
+              </div>
+            </div>
+          ))}
+
           <Dialog open={openEdit} onClose={handleCloseEdit}>
             <DialogTitle>Edit Track Info</DialogTitle>
             <DialogContent>

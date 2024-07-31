@@ -165,6 +165,10 @@ a {
   transition: transform 0.2s ease-in-out;
   border-radius: 30px;
   font-family: "Poppins";
+  transition: transform 0.3s ease; 
+}
+.track:hover {
+  transform: scale(1.02); 
 }
 
 .play-pause-button {
@@ -255,9 +259,6 @@ a {
   background: #3c2247;
 }
 
-.vertical-slider:hover {
-  opacity: 1; 
-}
 .input-duration::-webkit-slider-thumb {
   -webkit-appearance: none; 
   appearance: none;
@@ -333,4 +334,29 @@ a {
   cursor: pointer; 
   border-radius: 50%; 
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5); 
+}
+
+/* Playlists */
+.playlist-container{
+  width: 100%;
+}
+
+.playlist {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(147, 128, 173, 0.637);
+  border-radius: 10px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  box-shadow: 0px 0px 5px 5px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform 0.3s ease; 
+  font-family: "Poppins";
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.playlist:hover {
+  transform: scale(1.02); 
 }
