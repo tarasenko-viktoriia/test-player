@@ -361,3 +361,14 @@ a {
 .playlist:hover {
   transform: scale(1.02); 
 }
+
+/* Login */
+
+header {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  font-size: 16px;
+  gap: 15px;
+  margin-bottom: 20px;
+}

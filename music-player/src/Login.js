@@ -33,7 +33,7 @@ const ShowLogin = () => {
   const isLoggedIn = useSelector((state) => state.auth.token);
 
   return (
-    <span style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       {isLoggedIn && (
         <>
           <img
@@ -49,7 +49,7 @@ const ShowLogin = () => {
           <div>Nickname: {nick}</div>
         )}
       </div>
-    </span>
+    </div>
   );
 };
 
