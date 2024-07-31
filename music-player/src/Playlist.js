@@ -127,21 +127,23 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
           ))}
 
           <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
-            <DialogTitle>Create New Playlist</DialogTitle>
-            <DialogContent>
-              <TextField
-                margin="dense"
-                label="New Playlist Name"
-                type="text"
-                fullWidth
-                value={playlistName}
-                onChange={(e) => setPlaylistName(e.target.value)}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenCreateDialog(false)}>Cancel</Button>
-              <Button onClick={handleCreatePlaylist} color="primary">Create</Button>
-            </DialogActions>
+            <div className='create-playlist-dialog'>
+              <DialogTitle>Create New Playlist</DialogTitle>
+              <DialogContent>
+                <TextField
+                  margin="dense"
+                  label="New Playlist Name"
+                  type="text"
+                  fullWidth
+                  value={playlistName}
+                  onChange={(e) => setPlaylistName(e.target.value)}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenCreateDialog(false)}>Cancel</Button>
+                <Button onClick={handleCreatePlaylist} color="primary">Create</Button>
+              </DialogActions>
+            </div>
           </Dialog>
         </>
       ) : (

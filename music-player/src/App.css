@@ -372,3 +372,37 @@ header {
   gap: 15px;
   margin-bottom: 20px;
 }
+
+
+.create-playlist-dialog {
+  background-color: rgb(117, 104, 134);
+  color: white;
+  font-family: 'Poppins';
+  font-weight: 500;
+  font-size: 20px;
+  width: 500px;
+}
+
+.create-playlist-dialog  h2{
+  font-family: 'Poppins';
+  font-weight: 300;
+  font-size: 20px;
+}
+.create-playlist-dialog  label{
+  font-family: 'Poppins';
+  font-size: 16px;
+  color: #998cb9;
+}
+.create-playlist-dialog input{
+  color: white;
+  font-family: 'Poppins';
+  font-weight: 300;
+  font-size: 20px;
+}
+
+.create-playlist-dialog button{
+  color: white;
+  font-family: 'Poppins';
+  font-weight: 300;
+  font-size: 18px;
+}

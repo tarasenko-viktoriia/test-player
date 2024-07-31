@@ -44,7 +44,7 @@ const ShowLogin = () => {
         </>
       )}
       <div>
-        <div>Hi, {login || 'Anon'}</div>
+        <div>Hi, {login || 'Anon'}!</div>
         {isLoggedIn && (
           <div>Nickname: {nick}</div>
         )}
