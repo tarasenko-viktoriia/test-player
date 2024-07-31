@@ -124,6 +124,7 @@ a {
   padding: 25px;
   width: 100%;
   box-sizing: border-box;
+  gap: 20px;
 }
 
 .input-container {

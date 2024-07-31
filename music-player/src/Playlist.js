@@ -104,7 +104,8 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
     <div style={{ width: '100%' }}>
       {!selectedPlaylist ? (
         <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '18px', fontFamily:'Poppins'}}>
+              <div style={{fontWeight: '500'}}>My Playlists</div>
               <IconButton onClick={() => setOpenCreateDialog(true)}>
                 <AddIcon style={{ color: 'white', width: '40px', height: '40px' }} />
               </IconButton>
