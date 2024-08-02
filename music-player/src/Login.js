@@ -80,7 +80,6 @@ const authSlice = createSlice({
   reducers: {
     login(state, { payload: token }) {
       const decoded = jwtDecode(token);
-      console.log('Decoded Token:', decoded);
       if (decoded) {
         state.payload = { sub: { id: decoded.userId, login: decoded.login } };
         state.token = token;
