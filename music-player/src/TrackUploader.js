@@ -4,7 +4,7 @@ import { useDropzone } from 'react-dropzone';
 function TrackUploader({ addTrackToLibrary }) {
   const onDrop = (acceptedFiles) => {
     acceptedFiles.forEach((file) => {
-      const trackName = file.name.split('.').slice(0, -1).join('.'); // Use file name without extension
+      const trackName = file.name.split('.').slice(0, -1).join('.'); 
       const track = {
         name: trackName,
         artist: 'Unknown Artist',

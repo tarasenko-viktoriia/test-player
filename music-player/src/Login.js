@@ -101,7 +101,7 @@ const authSlice = createSlice({
     registerSuccess(state, { payload: token }) {
       const decoded = jwtDecode(token);
       if (decoded) {
-        state.payload = decoded;
+        state.payload = { sub: { id: decoded.id, login: decoded.login } };
         state.token = token;
       }
     },
@@ -246,7 +246,7 @@ const RegisterForm = ({ onClose }) => {
     try {
       const result = await dispatch(api.endpoints.registerUser.initiate({ login, password })).unwrap();
       if (result?.createUser) {
-        onClose(); // Закриття модального вікна
+        onClose(); 
       }
     } catch (error) {
       console.error('Registration failed:', error);
@@ -282,7 +282,7 @@ const ProfileModal = ({ onClose }) => {
       formData.append('avatar', avatar);
       const result = await uploadAvatar({ _id: userId, avatar: formData });
       if (result.data?.UserUpsert?.avatar?.url) {
-        console.log('Uploaded Avatar URL:', result.data.UserUpsert.avatar.url); // Додайте цей рядок
+        console.log('Uploaded Avatar URL:', result.data.UserUpsert.avatar.url); 
         dispatch(setProfile({ avatar: { url: result.data.UserUpsert.avatar.url } }));
       }
     }

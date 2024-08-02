@@ -7,10 +7,10 @@ const initialState = {
   library: [],
   playlists: [],
   currentIndex: -1,
-  currentContext: 'library', // 'library' or 'playlist'
+  currentContext: 'library', 
   currentPlaylist: null,
-  trackProgress: 0, // добавлено состояние для отслеживания прогресса трека
-  isShuffle: false, // добавлено состояние для режима случайного воспроизведения
+  trackProgress: 0, 
+  isShuffle: false, 
 };
 
 const playerSlice = createSlice({

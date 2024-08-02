@@ -162,8 +162,8 @@ function App() {
                 removeTrackFromPlaylist={removeTrackFromPlaylist}
                 updateTrackInfo={updateTrackInfo}
                 searchQuery={searchQuery}
-                deletePlaylist={deletePlaylist} // Передаем функцию удаления плейлиста
-                updatePlaylistName={updatePlaylistName} // Передаем функцию изменения названия плейлиста
+                deletePlaylist={deletePlaylist} 
+                updatePlaylistName={updatePlaylistName} 
               />
             )}
           </div>
