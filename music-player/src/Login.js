@@ -149,17 +149,18 @@ const api = createApi({
       }),
     }),
     setUserNick: builder.mutation({
-      query: ({ _id, nick }) => ({
+      query: ({ id, nick }) => ({
         document: `
-          mutation setNick($_id: String!, $nick: String!) {
-            UserUpsert(user: { _id: $_id, nick: $nick }) {
-              _id nick
+          mutation updateUserNick($id: ID!, $nick: String!) {
+            updateUserNick(id: $id, nick: $nick) {
+              id
+              nick
             }
           }
         `,
-        variables: { _id, nick },
+        variables: { id, nick },
       }),
-      invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
     }),
     registerUser: builder.mutation({
       query: ({ login, password }) => ({
@@ -275,7 +276,7 @@ const ProfileModal = ({ onClose }) => {
     if (avatar) {
       const formData = new FormData();
       formData.append('avatar', avatar);
-      const result = await uploadAvatar({ _id: userId, avatar: formData });
+      const result = await uploadAvatar({ id: userId, avatar: formData });
       if (result.data?.UserUpsert?.avatar?.url) {
         console.log('Uploaded Avatar URL:', result.data.UserUpsert.avatar.url); 
         dispatch(setProfile({ avatar: { url: result.data.UserUpsert.avatar.url } }));
@@ -283,9 +284,9 @@ const ProfileModal = ({ onClose }) => {
     }
   
     if (nick) {
-      const result = await setUserNick({ _id: userId, nick });
-      if (result.data?.UserUpsert?.nick) {
-        dispatch(setProfile({ nick: result.data.UserUpsert.nick }));
+      const result = await setUserNick({ id: userId, nick });
+      if (result.data?.updateUserNick?.nick) {
+        dispatch(setProfile({ nick: result.data.updateUserNick.nick }));
       }
     }
   
@@ -312,7 +313,6 @@ const ProfileModal = ({ onClose }) => {
     </div>
   );
 };
-
 
 const store = configureStore({
   reducer: {
