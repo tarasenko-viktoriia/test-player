@@ -27,10 +27,12 @@ function jwtDecode(token) {
 }
 
 const ShowLogin = () => {
-  const login = useSelector((state) => state.auth.payload?.sub.login);
-  const nick = useSelector((state) => state.auth.payload?.sub.nick);
+  const login = useSelector((state) => state.auth.payload?.sub?.login || 'Anon');
+  const nick = useSelector((state) => state.auth.payload?.sub?.nick || 'Unknown');;
   const avatarUrl = useSelector((state) => state.auth.profile?.avatar?.url);
-  const isLoggedIn = useSelector((state) => state.auth.token);
+  const isLoggedIn = useSelector((state) => Boolean(state.auth.token));
+
+  console.log('Login:', login, 'Nickname:', nick, 'Avatar URL:', avatarUrl, 'Is Logged In:', isLoggedIn);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -44,7 +46,7 @@ const ShowLogin = () => {
         </>
       )}
       <div>
-        <div>Hi, {login || 'Anon'}!</div>
+        <div>Hi, {login}!</div>
         {isLoggedIn && (
           <div>Nickname: {nick}</div>
         )}
@@ -52,6 +54,7 @@ const ShowLogin = () => {
     </div>
   );
 };
+
 
 
 const Logout = () => {
@@ -73,17 +76,18 @@ const Logout = () => {
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { token: null, payload: null, profile: null },
+  initialState: { token: null, payload: { sub: {} }, profile: null },
   reducers: {
     login(state, { payload: token }) {
       const decoded = jwtDecode(token);
+      console.log('Decoded Token:', decoded);
       if (decoded) {
-        state.payload = decoded;
+        state.payload = { sub: { id: decoded.userId, login: decoded.login } };
         state.token = token;
       }
     },
     logout(state) {
-      state.payload = null;
+      state.payload = { sub: {} };
       state.token = null;
       state.profile = null;
     },
@@ -110,7 +114,7 @@ const { login, logout, registerSuccess, setProfile } = authSlice.actions;
 
 const api = createApi({
   baseQuery: graphqlRequestBaseQuery({
-    url: 'http://player.node.ed.asmer.org.ua/graphql',
+    url: 'http://localhost:4000/graphql',
     prepareHeaders(headers, { getState }) {
       const { token } = getState().auth;
       if (token) {
@@ -166,11 +170,13 @@ const api = createApi({
     registerUser: builder.mutation({
       query: ({ login, password }) => ({
         document: `
-          mutation register($login: String!, $password: String!) {
-            createUser(login: $login, password: $password) {
-              _id login
-            }
+        mutation register($login: String!, $password: String!) {
+          register(login: $login, password: $password) {
+            id
+            login
+            nick
           }
+        }
         `,
         variables: { login, password },
       }),
@@ -241,7 +247,7 @@ const RegisterForm = ({ onClose }) => {
     try {
       const result = await dispatch(api.endpoints.registerUser.initiate({ login, password })).unwrap();
       if (result?.createUser) {
-        onClose();
+        onClose(); // Закриття модального вікна
       }
     } catch (error) {
       console.error('Registration failed:', error);
@@ -256,6 +262,8 @@ const RegisterForm = ({ onClose }) => {
     </div>
   );
 };
+
+
 
 const ProfileModal = ({ onClose }) => {
   const [nick, setNick] = useState('');
@@ -377,20 +385,20 @@ const App = () => {
   return (
     <Provider store={store}>
       <Router history={history}>
-          <Header onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} onProfileClick={openProfileModal} />
-            <Modal isOpen={isLoginModalOpen} onRequestClose={closeLoginModal}>
-              <h2>Login</h2>
-              <LoginForm onClose={closeLoginModal} />
-              <p onClick={() => { closeLoginModal(); openRegisterModal(); }}>Якщо ви не зареєстровані, натисність тут</p>
-            </Modal>
-            <Modal isOpen={isRegisterModalOpen} onRequestClose={closeRegisterModal}>
-              <h2>Register</h2>
-              <RegisterForm onClose={closeRegisterModal} />
-            </Modal>
-            <Modal isOpen={isProfileModalOpen} onRequestClose={closeProfileModal}>
-              <h2>Edit Profile</h2>
-              <ProfileModal onClose={closeProfileModal} />
-            </Modal>
+        <Header onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} onProfileClick={openProfileModal} />
+        <Modal isOpen={isLoginModalOpen} onRequestClose={closeLoginModal}>
+          <h2>Login</h2>
+          <LoginForm onClose={closeLoginModal} />
+          <p onClick={() => { closeLoginModal(); openRegisterModal(); }}>Якщо ви не зареєстровані, натисніть тут</p>
+        </Modal>
+        <Modal isOpen={isRegisterModalOpen} onRequestClose={closeRegisterModal}>
+        <h2>Register</h2>
+        <RegisterForm onClose={closeRegisterModal} />
+      </Modal>
+        <Modal isOpen={isProfileModalOpen} onRequestClose={closeProfileModal}>
+          <h2>Edit Profile</h2>
+          <ProfileModal onClose={closeProfileModal} />
+        </Modal>
       </Router>
     </Provider>
   );
