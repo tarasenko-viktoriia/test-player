@@ -123,15 +123,6 @@ const api = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getRootCats: builder.query({
-      query: () => ({
-        document: `query {
-          CategoryFind(query: "[{\\"parent\\": null}]"){
-            _id name
-          }
-        }`,
-      }),
-    }),
     login: builder.mutation({
       query: ({ login, password }) => ({
         document: `
@@ -144,14 +135,18 @@ const api = createApi({
     }),
     getUserById: builder.query({
       query: ({ _id }) => ({
-        document: `query oneUser($query: String){
-          UserFindOne(query: $query){
-            _id login nick avatar { url }
+        document: `
+          query getUser($id: ID!) {
+            getUser(id: $id) {
+              id
+              login
+              nick
+              avatar
+            }
           }
-        }`,
-        variables: { query: JSON.stringify([{ _id }]) },
+        `,
+        variables: { id: _id },
       }),
-      providesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
     }),
     setUserNick: builder.mutation({
       query: ({ _id, nick }) => ({
