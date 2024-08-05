@@ -1,30 +1,12 @@
 import React, { useState } from 'react';
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+
 import { Provider, useSelector, useDispatch } from 'react-redux';
-import { BrowserRouter as Router, Link} from 'react-router-dom'
-import { createBrowserHistory } from 'history';
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { graphqlRequestBaseQuery } from '@rtk-query/graphql-request-base-query';
-import storage from 'redux-persist/lib/storage';
-import { persistReducer, persistStore } from 'redux-persist';
 import Modal from 'react-modal';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
-
-const history = createBrowserHistory();
-
-function jwtDecode(token) {
-  try {
-    const [, data] = token.split('.');
-    const json = atob(data);
-    const result = JSON.parse(json);
-    return result;
-  } catch (e) {
-    console.error('Failed to decode JWT:', e);
-    return null;
-  }
-}
+import { login, logout, registerSuccess, setProfile } from "./authSlice"
+import {api, store, actionFullLogin, useUploadAvatarMutation, useSetUserNickMutation} from "./store"
 
 const ShowLogin = () => {
   const login = useSelector((state) => state.auth.payload?.sub?.login || 'Anon');
@@ -55,8 +37,6 @@ const ShowLogin = () => {
   );
 };
 
-
-
 const Logout = () => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.token);
@@ -72,165 +52,6 @@ const Logout = () => {
   return (
     <LogoutIcon onClick={handleLogout}/>
   );
-};
-
-const authSlice = createSlice({
-  name: 'auth',
-  initialState: { token: null, payload: { sub: {} }, profile: null },
-  reducers: {
-    login(state, { payload: token }) {
-      const decoded = jwtDecode(token);
-      if (decoded) {
-        state.payload = { sub: { id: decoded.userId, login: decoded.login } };
-        state.token = token;
-      }
-    },
-    logout(state) {
-      state.payload = { sub: {} };
-      state.token = null;
-      state.profile = null;
-    },
-    setProfile(state, { payload }) {
-      if (payload.avatar) {
-        state.profile = { ...state.profile, avatar: payload.avatar };
-      }
-      if (payload.nick) {
-        state.payload = { ...state.payload, sub: { ...state.payload.sub, nick: payload.nick } };
-      }
-    },
-    registerSuccess(state, { payload: token }) {
-      const decoded = jwtDecode(token);
-      if (decoded) {
-        state.payload = { sub: { id: decoded.id, login: decoded.login } };
-        state.token = token;
-      }
-    },
-  },
-});
-
-
-const { login, logout, registerSuccess, setProfile } = authSlice.actions;
-
-const api = createApi({
-  baseQuery: graphqlRequestBaseQuery({
-    url: 'http://localhost:4000/graphql',
-    prepareHeaders(headers, { getState }) {
-      const { token } = getState().auth;
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-  endpoints: (builder) => ({
-    login: builder.mutation({
-      query: ({ login, password }) => ({
-        document: `
-          query login($login: String!, $password: String!) {
-            login(login: $login, password: $password) 
-          }
-        `,
-        variables: { login, password },
-      }),
-    }),
-    getUserById: builder.query({
-      query: ({ _id }) => ({
-        document: `
-          query getUser($id: ID!) {
-            getUser(id: $id) {
-              id
-              login
-              nick
-              avatar
-            }
-          }
-        `,
-        variables: { id: _id },
-      }),
-    }),
-    setUserNick: builder.mutation({
-      query: ({ id, nick }) => ({
-        document: `
-          mutation updateUserNick($id: ID!, $nick: String!) {
-            updateUserNick(id: $id, nick: $nick) {
-              id
-              nick
-            }
-          }
-        `,
-        variables: { id, nick },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
-    }),
-    registerUser: builder.mutation({
-      query: ({ login, password }) => ({
-        document: `
-        mutation register($login: String!, $password: String!) {
-          register(login: $login, password: $password) {
-            id
-            login
-            nick
-          }
-        }
-        `,
-        variables: { login, password },
-      }),
-      async onQueryStarted({ login, password }, { dispatch, queryFulfilled }) {
-        try {
-          const result = await queryFulfilled;
-          console.log('Registration result:', result);
-          if (result.data && result.data.createUser) {
-            const loginResult = await dispatch(api.endpoints.login.initiate({ login, password })).unwrap();
-            console.log('Login result:', loginResult);
-            if (loginResult?.login) {
-              dispatch(registerSuccess(loginResult.login));
-              await dispatch(actionAboutMe());
-            }
-          }
-        } catch (error) {
-          console.error('Registration or login error:', error);
-        }
-      },
-    }),
-    uploadAvatar: builder.mutation({
-      query: ({ _id, avatar }) => ({
-        document: `
-          mutation uploadAvatar($_id: String!, $avatar: ImageInput!) {
-            UserUpsert(user: { _id: $_id, avatar: $avatar }) {
-              _id
-              avatar {
-                url
-              }
-            }
-          }
-        `,
-        variables: { _id, avatar },
-      }),
-      invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
-    }),
-  }),
-});
-
-const { useGetUserByIdQuery, useLoginMutation, useSetUserNickMutation, useUploadAvatarMutation } = api;
-
-const actionFullLogin = ({ login, password }) => async (dispatch) => {
-  try {
-    const token = await dispatch(api.endpoints.login.initiate({ login, password }));
-    if (token?.data?.login) {
-      dispatch(authSlice.actions.login(token.data.login));
-      await dispatch(actionAboutMe());
-    }
-  } catch (error) {
-    console.error('Login failed:', error);
-  }
-};
-
-const actionAboutMe = () => async (dispatch, getState) => {
-  const { auth } = getState();
-  if (auth.payload) {
-    const { id } = auth.payload.sub;
-    await dispatch(api.endpoints.getUserById.initiate({ _id: id }));
-  }
 };
 
 const RegisterForm = ({ onClose }) => {
@@ -257,8 +78,6 @@ const RegisterForm = ({ onClose }) => {
     </div>
   );
 };
-
-
 
 const ProfileModal = ({ onClose }) => {
   const [nick, setNick] = useState('');
@@ -314,16 +133,6 @@ const ProfileModal = ({ onClose }) => {
   );
 };
 
-const store = configureStore({
-  reducer: {
-    [authSlice.name]: persistReducer({ key: 'auth', storage }, authSlice.reducer),
-    [api.reducerPath]: api.reducer,
-  },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
-});
-
-const persistor = persistStore(store);
-
 const LoginForm = ({ onClose }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
@@ -377,8 +186,7 @@ const App = () => {
   const closeProfileModal = () => setIsProfileModalOpen(false);
 
   return (
-    <Provider store={store}>
-      <Router history={history}>
+    <> 
         <Header onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} onProfileClick={openProfileModal} />
         <Modal isOpen={isLoginModalOpen} onRequestClose={closeLoginModal}>
           <h2>Login</h2>
@@ -393,8 +201,7 @@ const App = () => {
           <h2>Edit Profile</h2>
           <ProfileModal onClose={closeProfileModal} />
         </Modal>
-      </Router>
-    </Provider>
+    </>
   );
 };
 
