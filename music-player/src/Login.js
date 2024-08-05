@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import Modal from 'react-modal';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
-import { login, logout, registerSuccess, setProfile } from "./authSlice"
-import {api, store, actionFullLogin, useUploadAvatarMutation, useSetUserNickMutation} from "./store"
+import CloseIcon from '@mui/icons-material/Close';
+import { useSelector, useDispatch } from 'react-redux';
+import { login, logout, registerSuccess, setProfile } from "./authSlice";
+import { api, store, actionFullLogin, useUploadAvatarMutation, useSetUserNickMutation } from "./store";
 
 const ShowLogin = () => {
   const login = useSelector((state) => state.auth.payload?.sub?.login || 'Anon');
@@ -72,9 +72,24 @@ const RegisterForm = ({ onClose }) => {
 
   return (
     <div>
-      <input value={login} onChange={(e) => setLogin(e.target.value)} placeholder="Login" />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" />
-      <button onClick={handleRegister}>Register</button>
+      <TextField 
+        value={login} 
+        onChange={(e) => setLogin(e.target.value)} 
+        label="Login" 
+        variant="outlined" 
+        fullWidth 
+        margin="normal"
+      />
+      <TextField 
+        value={password} 
+        onChange={(e) => setPassword(e.target.value)} 
+        label="Password" 
+        type="password" 
+        variant="outlined" 
+        fullWidth 
+        margin="normal"
+      />
+      <Button onClick={handleRegister} variant="contained" color="primary">Register</Button>
     </div>
   );
 };
@@ -114,21 +129,26 @@ const ProfileModal = ({ onClose }) => {
 
   return (
     <div>
-      <input 
+      <TextField 
         value={nick} 
         onChange={(e) => setNick(e.target.value)} 
-        placeholder="New Nickname" 
+        label="New Nickname" 
+        variant="outlined" 
+        fullWidth 
+        margin="normal"
       />
       <input 
         type="file" 
         onChange={handleFileChange} 
       />
-      <button 
+      <Button 
         onClick={handleUpload} 
         disabled={isAvatarLoading || isNickLoading}
+        variant="contained" 
+        color="primary"
       >
         Save Changes
-      </button>
+      </Button>
     </div>
   );
 };
@@ -145,9 +165,24 @@ const LoginForm = ({ onClose }) => {
 
   return (
     <div>
-      <input value={login} onChange={(e) => setLogin(e.target.value)} placeholder="Login" />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" />
-      <button onClick={handleLogin}>Login</button>
+      <TextField 
+        value={login} 
+        onChange={(e) => setLogin(e.target.value)} 
+        label="Login" 
+        variant="outlined" 
+        fullWidth 
+        margin="normal"
+      />
+      <TextField 
+        value={password} 
+        onChange={(e) => setPassword(e.target.value)} 
+        label="Password" 
+        type="password" 
+        variant="outlined" 
+        fullWidth 
+        margin="normal"
+      />
+      <Button onClick={handleLogin} variant="contained" color="primary">Login</Button>
     </div>
   );
 };
@@ -160,7 +195,7 @@ const Header = ({ onLoginClick, onRegisterClick, onProfileClick }) => {
       <ShowLogin />
       {!isLoggedIn && (
         <>
-        <LoginIcon onClick={onLoginClick}/>
+          <LoginIcon onClick={onLoginClick}/>
         </>
       )}
       {isLoggedIn && (
@@ -186,24 +221,51 @@ const App = () => {
   const closeProfileModal = () => setIsProfileModalOpen(false);
 
   return (
-    <> 
-        <Header onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} onProfileClick={openProfileModal} />
-        <Modal isOpen={isLoginModalOpen} onRequestClose={closeLoginModal}>
-          <h2>Login</h2>
+    <>
+      <Header onLoginClick={openLoginModal} onRegisterClick={openRegisterModal} onProfileClick={openProfileModal} />
+      <Dialog open={isLoginModalOpen} onClose={closeLoginModal}>
+        <DialogTitle>
+          Login
+            <CloseIcon             edge="end" 
+            color="inherit" 
+            onClick={closeLoginModal} 
+            aria-label="close"
+            sx={{ position: 'absolute', right: 8, top: 8 }} />
+        </DialogTitle>
+        <DialogContent>
           <LoginForm onClose={closeLoginModal} />
-          <p onClick={() => { closeLoginModal(); openRegisterModal(); }}>Якщо ви не зареєстровані, натисніть тут</p>
-        </Modal>
-        <Modal isOpen={isRegisterModalOpen} onRequestClose={closeRegisterModal}>
-        <h2>Register</h2>
-        <RegisterForm onClose={closeRegisterModal} />
-      </Modal>
-        <Modal isOpen={isProfileModalOpen} onRequestClose={closeProfileModal}>
-          <h2>Edit Profile</h2>
+          <p onClick={() => { closeLoginModal(); openRegisterModal(); }}>No account on Bits? Sign up</p>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isRegisterModalOpen} onClose={closeRegisterModal}>
+        <DialogTitle>
+          Register
+            <CloseIcon             edge="end" 
+            color="inherit" 
+            onClick={closeRegisterModal} 
+            aria-label="close"
+            sx={{ position: 'absolute', right: 8, top: 8 }} />
+        </DialogTitle>
+        <DialogContent>
+          <RegisterForm onClose={closeRegisterModal} />
+          <p onClick={() => { closeRegisterModal(); openLoginModal(); }}>Already have an account in Beats? Log In</p>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isProfileModalOpen} onClose={closeProfileModal}>
+        <DialogTitle>
+          Edit Profile
+            <CloseIcon             edge="end" 
+            color="inherit" 
+            onClick={closeProfileModal} 
+            aria-label="close"
+            sx={{ position: 'absolute', right: 8, top: 8 }}/>
+        </DialogTitle>
+        <DialogContent>
           <ProfileModal onClose={closeProfileModal} />
-        </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
-
 
 export default App;
