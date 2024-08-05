@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTrack, play, pause, togglePlayPause } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
@@ -8,10 +8,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
+import { useAddPlaylistMutation, useDeletePlaylistMutation } from './store';
 
-function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTrackInfo, searchQuery, deletePlaylist, updatePlaylistName }) {
+function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery, updatePlaylistName }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
+  const playlists = useSelector((state) => state.playlists);
   const [playlistName, setPlaylistName] = useState('');
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
@@ -22,14 +24,23 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
   const [newArtistName, setNewArtistName] = useState('');
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
-  const handleCreatePlaylist = () => {
-    createPlaylist(playlistName);
+  const [addPlaylist, { data: newPlaylistData }] = useAddPlaylistMutation();
+  const [deletePlaylist] = useDeletePlaylistMutation();
+
+  useEffect(() => {
+    if (newPlaylistData) {
+      dispatch({ type: 'playlists/addPlaylist', payload: newPlaylistData.addPlaylist });
+    }
+  }, [newPlaylistData, dispatch]);
+
+  const handleCreatePlaylist = async () => {
+    await addPlaylist({ title: playlistName });
     setPlaylistName('');
     setOpenCreateDialog(false);
   };
 
-  const handleDeletePlaylist = (playlistName) => {
-    deletePlaylist(playlistName);
+  const handleDeletePlaylist = async (playlistId) => {
+    await deletePlaylist({ id: playlistId });
     setSelectedPlaylist(null);
   };
 
@@ -91,14 +102,14 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
     }
   };
 
-  const filteredPlaylists = playlists.map((playlist) => ({
+  const filteredPlaylists = playlists?.map((playlist) => ({
     ...playlist,
-    tracks: playlist.tracks.filter(
+    tracks: playlist.tracks?.filter(
       (track) =>
         track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         track.artist.toLowerCase().includes(searchQuery.toLowerCase())
     ),
-  }));
+  })) || [];
 
   return (
     <div style={{ width: '100%' }}>
@@ -113,13 +124,13 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
           {filteredPlaylists.map((playlist, index) => (
             <div className='playlist' key={index} onClick={() => setSelectedPlaylist(playlist)}>
             <div>
-              {playlist.name}
+              {playlist.title}
             </div>
             <div className='track-controls'>
               <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEditPlaylistName(playlist); }}>
                 <EditIcon style={{ color: 'white' }} />
               </IconButton>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.name); }}>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.id); }}>
                 <DeleteIcon style={{ color: 'white' }} />
               </IconButton>
             </div>
@@ -150,7 +161,7 @@ function Playlist({ playlists, createPlaylist, removeTrackFromPlaylist, updateTr
         <div className='playlist-container'>
           <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
           <h3>{selectedPlaylist.name}</h3>
-          {selectedPlaylist.tracks.map((track, trackIndex) => (
+          {selectedPlaylist.tracks?.map((track, trackIndex) => (
             <div className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`}
               key={trackIndex}
               onClick={() => handlePlayPause(track, trackIndex, selectedPlaylist)}

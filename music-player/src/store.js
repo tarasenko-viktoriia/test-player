@@ -5,7 +5,7 @@ import storage from 'redux-persist/lib/storage';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { graphqlRequestBaseQuery } from '@rtk-query/graphql-request-base-query';
 import authSlice, {registerSuccess} from './authSlice'; 
-
+import playlistReducer from './playlistSlice';
 
 export const actionFullLogin = ({ login, password }) => async (dispatch) => {
   try {
@@ -124,16 +124,44 @@ const api = createApi({
       }),
       invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
     }),
+    addPlaylist: builder.mutation({
+      query: ({ title, fileIds }) => ({
+        document: `
+          mutation addPlaylist($playlist: PlaylistInput!) {
+            addPlaylist(playlist: $playlist) {
+              id
+              title
+            }
+          }
+        `,
+        variables: { playlist: { title, fileIds } },
+      }),
+      invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
+    }),
+    deletePlaylist: builder.mutation({
+      query: ({ id }) => ({
+        document: `
+          mutation deletePlaylist($id: ID!) {
+            deletePlaylist(id: $id) {
+              id
+            }
+          }
+        `,
+        variables: { id },
+  }),
+  invalidatesTags: (result, error, { id }) => [{ type: 'Playlist', id }],
+    }),
   }),
 });
 
-export const { useUploadAvatarMutation, useSetUserNickMutation} = api;
+export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation,} = api;
 
 const store = configureStore({
   reducer: {
     player: playerReducer,
     [authSlice.name]: persistReducer({ key: 'auth', storage }, authSlice.reducer),
     [api.reducerPath]: api.reducer,
+    playlists: playlistReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),
