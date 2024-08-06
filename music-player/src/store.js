@@ -151,7 +151,7 @@ const api = createApi({
   }),
   invalidatesTags: (result, error, { id }) => [{ type: 'Playlist', id }],
     }),
-    updatePlaylistName: builder.mutation({
+    updatePlaylistTitle: builder.mutation({
       query: ({ id, title }) => ({
         document: `
           mutation updatePlaylist($id: ID!, $playlist: PlaylistInput!) {
@@ -168,7 +168,7 @@ const api = createApi({
   }),
 });
 
-export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistNameMutation } = api;
+export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation } = api;
 
 const store = configureStore({
   reducer: {

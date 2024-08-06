@@ -115,8 +115,8 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
             fullWidth
           >
             {playlists.map((playlist, index) => (
-              <MenuItem key={index} value={playlist.name}>
-                {playlist.name}
+              <MenuItem key={index} value={playlist.title}>
+                {playlist.title}
               </MenuItem>
             ))}
           </Select>

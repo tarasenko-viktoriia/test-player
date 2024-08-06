@@ -32,7 +32,7 @@ function App() {
   const addTrackToPlaylist = (track, playlistName) => {
     setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
-        if (playlist.name === playlistName) {
+        if (playlist.title === playlistName) {
           return {
             ...playlist,
             tracks: [...playlist.tracks, track],
@@ -47,7 +47,7 @@ function App() {
   const removeTrackFromPlaylist = (playlistName, trackUrl) => {
     setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
-        if (playlist.name === playlistName) {
+        if (playlist.title === playlistName) {
           return {
             ...playlist,
             tracks: playlist.tracks.filter((track) => track.url !== trackUrl),
@@ -59,18 +59,18 @@ function App() {
     });
   };
 
-  const createPlaylist = (name) => {
-    setPlaylistsState([...playlists, { name, tracks: [] }]);
+  const createPlaylist = (title) => {
+    setPlaylistsState([...playlists, { title, tracks: [] }]);
   };
 
   const deletePlaylist = (playlistName) => {
-    setPlaylistsState(playlists.filter(playlist => playlist.name !== playlistName));
+    setPlaylistsState(playlists.filter(playlist => playlist.title !== playlistName));
   };
 
   const updatePlaylistName = (oldName, newName) => {
     setPlaylistsState(playlists.map(playlist => {
-      if (playlist.name === oldName) {
-        return { ...playlist, name: newName };
+      if (playlist.title === oldName) {
+        return { ...playlist, title: newName };
       }
       return playlist;
     }));

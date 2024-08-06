@@ -8,16 +8,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
-import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistNameMutation } from './store';
+import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation } from './store';
 
 function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const playlists = useSelector((state) => state.playlists);
-  const [playlistName, setPlaylistName] = useState('');
-  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [playlistTitle, setPlaylistTitle] = useState('');
+  const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
-  const [openEditPlaylistName, setOpenEditPlaylistName] = useState(false);
+  const [openEditPlaylistTitle, setOpenEditPlaylistTitle] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [newTrackName, setNewTrackName] = useState('');
@@ -26,7 +26,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
 
   const [addPlaylist, { data: newPlaylistData }] = useAddPlaylistMutation();
   const [deletePlaylist] = useDeletePlaylistMutation();
-  const [updatePlaylistName] = useUpdatePlaylistNameMutation();
+  const [updatePlaylistTitle] = useUpdatePlaylistTitleMutation();
 
   useEffect(() => {
     if (newPlaylistData) {
@@ -35,8 +35,8 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   }, [newPlaylistData, dispatch]);
 
   const handleCreatePlaylist = async () => {
-    await addPlaylist({ title: playlistName });
-    setPlaylistName('');
+    await addPlaylist({ title: playlistTitle });
+    setPlaylistTitle('');
     setOpenCreateDialog(false);
   };
 
@@ -56,8 +56,8 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     }
   };
 
-  const handleRemoveTrack = (playlistName, trackUrl) => {
-    removeTrackFromPlaylist(playlistName, trackUrl);
+  const handleRemoveTrack = (playlistTitle, trackUrl) => {
+    removeTrackFromPlaylist(playlistTitle, trackUrl);
     setSelectedPlaylist((prevSelectedPlaylist) => ({
       ...prevSelectedPlaylist,
       tracks: prevSelectedPlaylist.tracks.filter((track) => track.url !== trackUrl),
@@ -85,26 +85,26 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     }
   };
 
-  const handleOpenEditPlaylistName = (playlist) => {
+  const handleOpenEditPlaylistTitle = (playlist) => {
     setSelectedPlaylist(playlist);
-    setNewPlaylistName(playlist.name);
-    setOpenEditPlaylistName(true);
+    setNewPlaylistTitle(playlist.title);
+    setOpenEditPlaylistTitle(true);
   };
 
-  const handleCloseEditPlaylistName = () => {
-    setOpenEditPlaylistName(false);
+  const handleCloseEditPlaylistTitle = () => {
+    setOpenEditPlaylistTitle(false);
     setSelectedPlaylist(null);
-    setNewPlaylistName('');
+    setNewPlaylistTitle('');
   };
 
-  const handleUpdatePlaylistName = async () => {
+  const handleUpdatePlaylistTitle = async () => {
     if (selectedPlaylist) {
-      await updatePlaylistName({ id: selectedPlaylist.id, title: newPlaylistName });
+      await updatePlaylistTitle({ id: selectedPlaylist.id, title: newPlaylistTitle });
       dispatch({
-        type: 'playlists/updatePlaylistName',
-        payload: { id: selectedPlaylist.id, title: newPlaylistName },
+        type: 'playlists/updatePlaylistTitle',
+        payload: { id: selectedPlaylist.id, title: newPlaylistTitle },
       });
-      handleCloseEditPlaylistName();
+      handleCloseEditPlaylistTitle();
     }
   };
 
@@ -133,7 +133,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
               {playlist.title}
             </div>
             <div className='track-controls'>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEditPlaylistName(playlist); }}>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEditPlaylistTitle(playlist); }}>
                 <EditIcon style={{ color: 'white' }} />
               </IconButton>
               <IconButton onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.id); }}>
@@ -149,11 +149,11 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
               <DialogContent>
                 <TextField
                   margin="dense"
-                  label="New Playlist Name"
+                  label="New Playlist Title"
                   type="text"
                   fullWidth
-                  value={playlistName}
-                  onChange={(e) => setPlaylistName(e.target.value)}
+                  value={playlistTitle}
+                  onChange={(e) => setPlaylistTitle(e.target.value)}
                 />
               </DialogContent>
               <DialogActions>
@@ -166,7 +166,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
       ) : (
         <div className='playlist-container'>
           <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
-          <h3>{selectedPlaylist.name}</h3>
+          <h3>{selectedPlaylist.title}</h3>
           {selectedPlaylist.tracks?.map((track, trackIndex) => (
             <div className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`}
               key={trackIndex}
@@ -179,7 +179,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
                 <strong>{track.name}</strong> by {track.artist}
               </div>
               <div className='track-controls'>
-                <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.name, track.url); }}>
+                <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.title, track.url); }}>
                   <DeleteIcon style={{ color: 'white' }} />
                 </IconButton>
                 <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
@@ -216,21 +216,21 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
             </DialogActions>
           </Dialog>
 
-          <Dialog open={openEditPlaylistName} onClose={handleCloseEditPlaylistName}>
-            <DialogTitle>Edit Playlist Name</DialogTitle>
+          <Dialog open={openEditPlaylistTitle} onClose={handleCloseEditPlaylistTitle}>
+            <DialogTitle>Edit Playlist Title</DialogTitle>
             <DialogContent>
               <TextField
                 margin="dense"
-                label="New Playlist Name"
+                label="New Playlist Title"
                 type="text"
                 fullWidth
-                value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
+                value={newPlaylistTitle}
+                onChange={(e) => setNewPlaylistTitle(e.target.value)}
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseEditPlaylistName}>Cancel</Button>
-              <Button onClick={handleUpdatePlaylistName} color="primary">Save</Button>
+              <Button onClick={handleCloseEditPlaylistTitle}>Cancel</Button>
+              <Button onClick={handleUpdatePlaylistTitle} color="primary">Save</Button>
             </DialogActions>
           </Dialog>
         </div>
