@@ -7,6 +7,9 @@ const playlistSlice = createSlice({
     addPlaylist: (state, action) => {
       state.push(action.payload);
     },
+    removePlaylist: (state, action) => {
+      return state.filter(playlist => playlist.id !== action.payload);
+    },
   },
 });
 

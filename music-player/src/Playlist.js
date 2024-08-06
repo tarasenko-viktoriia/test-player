@@ -41,6 +41,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery, updat
 
   const handleDeletePlaylist = async (playlistId) => {
     await deletePlaylist({ id: playlistId });
+    dispatch({ type: 'playlists/removePlaylist', payload: playlistId });
     setSelectedPlaylist(null);
   };
 
