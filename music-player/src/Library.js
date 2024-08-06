@@ -22,6 +22,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
     track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     track.artist.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
@@ -50,7 +51,6 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
       handleCloseAdd();
     }
   };
-
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
     setNewTrackName(track.name);

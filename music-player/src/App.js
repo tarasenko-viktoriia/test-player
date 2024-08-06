@@ -28,11 +28,10 @@ function App() {
   const addTrackToLibrary = (track) => {
     setLibraryState([...library, track]);
   };
-
-  const addTrackToPlaylist = (track, playlistName) => {
+  const addTrackToPlaylist = (track, playlistTitle) => {
     setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
-        if (playlist.title === playlistName) {
+        if (playlist.title === playlistTitle) {
           return {
             ...playlist,
             tracks: [...playlist.tracks, track],
@@ -40,14 +39,15 @@ function App() {
         }
         return playlist;
       });
+      dispatch(setPlaylists(updatedPlaylists));
       return updatedPlaylists;
     });
   };
 
-  const removeTrackFromPlaylist = (playlistName, trackUrl) => {
+  const removeTrackFromPlaylist = (playlistTitle, trackUrl) => {
     setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
-        if (playlist.title === playlistName) {
+        if (playlist.title === playlistTitle) {
           return {
             ...playlist,
             tracks: playlist.tracks.filter((track) => track.url !== trackUrl),
@@ -59,22 +59,6 @@ function App() {
     });
   };
 
-  const createPlaylist = (title) => {
-    setPlaylistsState([...playlists, { title, tracks: [] }]);
-  };
-
-  const deletePlaylist = (playlistName) => {
-    setPlaylistsState(playlists.filter(playlist => playlist.title !== playlistName));
-  };
-
-  const updatePlaylistName = (oldName, newName) => {
-    setPlaylistsState(playlists.map(playlist => {
-      if (playlist.title === oldName) {
-        return { ...playlist, title: newName };
-      }
-      return playlist;
-    }));
-  };
 
   const updateTrackInfo = (url, newName, newArtist) => {
     setLibraryState((prevLibrary) => prevLibrary.map(track => {
@@ -158,12 +142,9 @@ function App() {
             ) : (
               <Playlist
                 playlists={playlists}
-                createPlaylist={createPlaylist}
                 removeTrackFromPlaylist={removeTrackFromPlaylist}
                 updateTrackInfo={updateTrackInfo}
                 searchQuery={searchQuery}
-                deletePlaylist={deletePlaylist} 
-                updatePlaylistName={updatePlaylistName} 
               />
             )}
           </div>
