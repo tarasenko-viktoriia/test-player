@@ -8,9 +8,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
-import { useAddPlaylistMutation, useDeletePlaylistMutation } from './store';
+import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistNameMutation } from './store';
 
-function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery, updatePlaylistName }) {
+function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const playlists = useSelector((state) => state.playlists);
@@ -26,6 +26,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery, updat
 
   const [addPlaylist, { data: newPlaylistData }] = useAddPlaylistMutation();
   const [deletePlaylist] = useDeletePlaylistMutation();
+  const [updatePlaylistName] = useUpdatePlaylistNameMutation();
 
   useEffect(() => {
     if (newPlaylistData) {
@@ -96,9 +97,13 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery, updat
     setNewPlaylistName('');
   };
 
-  const handleUpdatePlaylistName = () => {
+  const handleUpdatePlaylistName = async () => {
     if (selectedPlaylist) {
-      updatePlaylistName(selectedPlaylist.name, newPlaylistName);
+      await updatePlaylistName({ id: selectedPlaylist.id, title: newPlaylistName });
+      dispatch({
+        type: 'playlists/updatePlaylistName',
+        payload: { id: selectedPlaylist.id, title: newPlaylistName },
+      });
       handleCloseEditPlaylistName();
     }
   };
@@ -183,6 +188,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery, updat
               </div>
             </div>
           ))}
+
 
           <Dialog open={openEdit} onClose={handleCloseEdit}>
             <DialogTitle>Edit Track Info</DialogTitle>

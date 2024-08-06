@@ -10,6 +10,13 @@ const playlistSlice = createSlice({
     removePlaylist: (state, action) => {
       return state.filter(playlist => playlist.id !== action.payload);
     },
+    updatePlaylistName: (state, action) => {
+      const { id, title } = action.payload;
+      const playlist = state.find(playlist => playlist.id === id);
+      if (playlist) {
+        playlist.title = title;
+      }
+    },
   },
 });
 
