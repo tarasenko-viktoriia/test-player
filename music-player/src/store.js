@@ -110,20 +110,20 @@ const api = createApi({
     }),
     uploadAvatar: builder.mutation({
       query: ({ _id, avatar }) => ({
-        document: `
-          mutation uploadAvatar($_id: String!, $avatar: ImageInput!) {
-            UserUpsert(user: { _id: $_id, avatar: $avatar }) {
-              _id
-              avatar {
-                url
+          document: `
+            mutation setAvatar($avatarId: ID!) {
+              setAvatar(avatarId: $avatarId) {
+                id
+                avatars {
+                  url
+                }
               }
             }
-          }
-        `,
-        variables: { _id, avatar },
+          `,
+          variables: { avatarId: avatar }, 
       }),
       invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
-    }),
+  }),
     addPlaylist: builder.mutation({
       query: ({ title, fileIds }) => ({
         document: `
