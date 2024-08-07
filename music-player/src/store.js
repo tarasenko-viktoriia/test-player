@@ -165,10 +165,26 @@ const api = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Playlist', id }],
     }),
-  }),
+    addTracksToLibrary: builder.mutation({
+      query: (fileIds) => ({
+        document: `
+          mutation addTracksToLibrary($fileIds: [ID!]!) {
+            addTracksToLibrary(fileIds: $fileIds) {
+              id
+              originalname
+              url
+            }
+          }
+        `,
+        variables: { fileIds },
+      }),
+    }),
+})
 });
 
-export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation } = api;
+
+
+export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useAddTracksToLibraryMutation} = api;
 
 const store = configureStore({
   reducer: {
