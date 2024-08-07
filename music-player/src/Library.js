@@ -15,11 +15,11 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
-  const [newTrackName, setNewTrackName] = useState('');
+  const [newTrackTitle, setNewTrackTitle] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
 
   const filteredLibrary = library.filter((track) =>
-    track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     track.artist.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
@@ -53,7 +53,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
   };
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
-    setNewTrackName(track.name);
+    setNewTrackTitle(track.title);
     setNewArtistName(track.artist);
     setOpenEdit(true);
   };
@@ -61,13 +61,13 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
   const handleCloseEdit = () => {
     setOpenEdit(false);
     setSelectedTrack(null);
-    setNewTrackName('');
+    setNewTrackTitle('');
     setNewArtistName('');
   };
 
   const handleUpdateTrackInfo = () => {
     if (selectedTrack) {
-      updateTrackInfo(selectedTrack.url, newTrackName, newArtistName);
+      updateTrackInfo(selectedTrack.url, newTrackTitle, newArtistName);
       handleCloseEdit();
     }
   };
@@ -88,7 +88,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
             {currentTrack && currentTrack.url === track.url && isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
           </span>
           <div className='track-info'>
-            <strong>{track.name}</strong> by {track.artist}
+            <strong>{track.title}</strong> by {track.artist}
           </div>
           <div className='track-controls'>
             <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
@@ -131,11 +131,11 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
         <DialogContent>
           <TextField
             margin="dense"
-            label="Track Name"
+            label="Track Title"
             type="text"
             fullWidth
-            value={newTrackName}
-            onChange={(e) => setNewTrackName(e.target.value)}
+            value={newTrackTitle}
+            onChange={(e) => setNewTrackTitle(e.target.value)}
           />
           <TextField
             margin="dense"

@@ -89,7 +89,7 @@ function Player() {
             <img className={isPlaying ? 'spin' : ''} src='../image/player-image.png' width="100px"></img>
           </div>
           <div className='track-id3'>
-            <h2> {currentTrack.name}</h2>
+            <h2> {currentTrack.title}</h2>
             <h3> {currentTrack.artist}</h3>
           </div>
           <div className="player-controls-container">

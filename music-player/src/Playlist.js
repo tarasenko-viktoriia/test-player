@@ -20,7 +20,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const [openEditPlaylistTitle, setOpenEditPlaylistTitle] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
-  const [newTrackName, setNewTrackName] = useState('');
+  const [newTrackTitle, setNewTrackTitle] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
@@ -66,7 +66,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
 
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
-    setNewTrackName(track.name);
+    setNewTrackTitle(track.title);
     setNewArtistName(track.artist);
     setOpenEdit(true);
   };
@@ -74,13 +74,13 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const handleCloseEdit = () => {
     setOpenEdit(false);
     setSelectedTrack(null);
-    setNewTrackName('');
+    setNewTrackTitle('');
     setNewArtistName('');
   };
 
   const handleUpdateTrackInfo = () => {
     if (selectedTrack) {
-      updateTrackInfo(selectedTrack.url, newTrackName, newArtistName);
+      updateTrackInfo(selectedTrack.url, newTrackTitle, newArtistName);
       handleCloseEdit();
     }
   };
@@ -112,7 +112,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     ...playlist,
     tracks: playlist.tracks?.filter(
       (track) =>
-        track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         track.artist.toLowerCase().includes(searchQuery.toLowerCase())
     ),
   })) || [];
@@ -176,7 +176,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
                 {currentTrack && currentTrack.url === track.url && isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
               </span>
               <div className='track-info'>
-                <strong>{track.name}</strong> by {track.artist}
+                <strong>{track.title}</strong> by {track.artist}
               </div>
               <div className='track-controls'>
                 <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.title, track.url); }}>
@@ -195,11 +195,11 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
             <DialogContent>
               <TextField
                 margin="dense"
-                label="Track Name"
+                label="Track Title"
                 type="text"
                 fullWidth
-                value={newTrackName}
-                onChange={(e) => setNewTrackName(e.target.value)}
+                value={newTrackTitle}
+                onChange={(e) => setNewTrackTitle(e.target.value)}
               />
               <TextField
                 margin="dense"

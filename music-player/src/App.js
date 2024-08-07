@@ -60,10 +60,10 @@ function App() {
   };
 
 
-  const updateTrackInfo = (url, newName, newArtist) => {
+  const updateTrackInfo = (url, newTitle, newArtist) => {
     setLibraryState((prevLibrary) => prevLibrary.map(track => {
       if (track.url === url) {
-        const updatedTrack = { ...track, name: newName, artist: newArtist };
+        const updatedTrack = { ...track, title: newTitle, artist: newArtist };
         if (currentTrack && currentTrack.url === url) {
           dispatch(setTrack({ track: updatedTrack, index: -1, context: 'library', playlist: null }));
         }
@@ -75,7 +75,7 @@ function App() {
       ...playlist,
       tracks: playlist.tracks.map(track => {
         if (track.url === url) {
-          const updatedTrack = { ...track, name: newName, artist: newArtist };
+          const updatedTrack = { ...track, title: newTitle, artist: newArtist };
           if (currentTrack && currentTrack.url === url) {
             dispatch(setTrack({ track: updatedTrack, index: -1, context: 'playlist', playlist: null }));
           }
