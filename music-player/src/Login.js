@@ -126,7 +126,7 @@ const ProfileModal = ({ onClose }) => {
   
     onClose();
   };
-
+  
   return (
     <div>
       <TextField 

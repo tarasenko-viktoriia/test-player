@@ -109,21 +109,21 @@ const api = createApi({
       },
     }),
     uploadAvatar: builder.mutation({
-      query: ({ _id, avatar }) => ({
-          document: `
-            mutation setAvatar($avatarId: ID!) {
-              setAvatar(avatarId: $avatarId) {
-                id
-                avatars {
-                  url
-                }
+      query: ({ avatarId }) => ({
+        document: `
+          mutation setAvatar($avatarId: ID!) {
+            setAvatar(avatarId: $avatarId) {
+              id
+              avatars {
+                url
               }
             }
-          `,
-          variables: { avatarId: avatar }, 
+          }
+        `,
+        variables: { avatarId }, // Передайте `avatarId` у змінних
       }),
       invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
-  }),
+    }),
     addPlaylist: builder.mutation({
       query: ({ title, fileIds }) => ({
         document: `
