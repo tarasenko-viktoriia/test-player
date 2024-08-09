@@ -116,24 +116,12 @@ const ProfileModal = ({ onClose }) => {
           method: 'POST',
           body: formData,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.authToken}`,
           },
         });
   
         const data = await response.json();
-        
-        if (data.id) {
-          const result = await setUserNick({ id: userId, nick });
-          
-          if (result.data?.updateUserNick?.nick) {
-            await dispatch(setProfile({ nick: result.data.updateUserNick.nick, avatar: data }));
-            await dispatch(api.endpoints.setAvatar.initiate({ avatarId: data.id }));
-          }
-          
-          console.log('Avatar updated successfully:', data.url);
-        } else {
-          console.error('Error uploading avatar:', data);
-        }
+    
       } catch (error) {
         console.error('Error uploading avatar:', error);
       }
