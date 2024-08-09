@@ -120,7 +120,7 @@ const api = createApi({
             }
           }
         `,
-        variables: { avatarId }, // Передайте `avatarId` у змінних
+        variables: { avatarId }, 
       }),
       invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
     }),
