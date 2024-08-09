@@ -109,11 +109,33 @@ const ProfileModal = ({ onClose }) => {
   const handleUpload = async () => {
     if (avatar) {
       const formData = new FormData();
-      formData.append('avatar', avatar);
-      const result = await uploadAvatar({ id: userId, avatar: formData });
-      if (result.data?.UserUpsert?.avatar?.url) {
-        console.log('Uploaded Avatar URL:', result.data.UserUpsert.avatar.url); 
-        dispatch(setProfile({ avatar: { url: result.data.UserUpsert.avatar.url } }));
+      formData.append('file', avatar);
+  
+      try {
+        const response = await fetch('http://localhost:4000/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+  
+        const data = await response.json();
+        
+        if (data.id) {
+          const result = await setUserNick({ id: userId, nick });
+          
+          if (result.data?.updateUserNick?.nick) {
+            await dispatch(setProfile({ nick: result.data.updateUserNick.nick, avatar: data }));
+            await dispatch(api.endpoints.setAvatar.initiate({ avatarId: data.id }));
+          }
+          
+          console.log('Avatar updated successfully:', data.url);
+        } else {
+          console.error('Error uploading avatar:', data);
+        }
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
       }
     }
   
