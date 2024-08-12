@@ -28,6 +28,8 @@ function App() {
   const addTrackToLibrary = (track) => {
     setLibraryState([...library, track]);
   };
+
+
   const addTrackToPlaylist = (track, playlistTitle) => {
     setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
@@ -153,7 +155,7 @@ function App() {
           <div className='sidebar-right'>
             <Login/>
             <Player />
-            <TrackUploader className="dropzone" addTrackToLibrary={addTrackToLibrary} />
+            <TrackUploader className="dropzone" onTrackUploaded={addTrackToLibrary} />
           </div>
         </div>
       </div>

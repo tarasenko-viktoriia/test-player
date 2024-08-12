@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 
 function TrackUploader({ onTrackUploaded }) {
   const [addTracksToLibrary] = useAddTracksToLibraryMutation();
-  
   const authToken = useSelector((state) => state.auth.token);
 
   const onDrop = async (acceptedFiles) => {
@@ -35,7 +34,11 @@ function TrackUploader({ onTrackUploaded }) {
 
         await addTracksToLibrary([id]);
 
-        onTrackUploaded(track);
+        if (typeof onTrackUploaded === 'function') {
+          onTrackUploaded(track);
+        } else {
+          console.error('onTrackUploaded is not a function');
+        }
       } else {
         console.error("Upload failed:", data);
       }
@@ -53,5 +56,6 @@ function TrackUploader({ onTrackUploaded }) {
     </div>
   );
 }
+
 
 export default TrackUploader;

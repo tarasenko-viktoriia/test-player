@@ -126,7 +126,7 @@ const ProfileModal = ({ onClose }) => {
         const data = await response.json();
         
         if (data?.url) {
-          dispatch(setProfile({ avatar: { url: data.url } }));
+          dispatch(setProfile({ avatar: { url: data.url }}));
         }
   
       } catch (error) {
