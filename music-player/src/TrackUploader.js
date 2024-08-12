@@ -1,9 +1,13 @@
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useAddTracksToLibraryMutation } from './store';
+import { useSelector } from 'react-redux';
 
 function TrackUploader({ onTrackUploaded }) {
   const [addTracksToLibrary] = useAddTracksToLibraryMutation();
+  
+  // Отримання токену з Redux
+  const authToken = useSelector((state) => state.auth.token);
 
   const onDrop = async (acceptedFiles) => {
     const formData = new FormData();
@@ -15,7 +19,7 @@ function TrackUploader({ onTrackUploaded }) {
       const response = await fetch('http://localhost:4000/upload', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.authToken}`,
+          Authorization: `Bearer ${authToken}`,  // Використання токену з Redux
         },
         body: formData,
       });
