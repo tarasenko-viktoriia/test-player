@@ -10,7 +10,7 @@ import { api, store, actionFullLogin, useUploadAvatarMutation, useSetUserNickMut
 
 const ShowLogin = () => {
   const login = useSelector((state) => state.auth.payload?.sub?.login || 'Anon');
-  const nick = useSelector((state) => state.auth.payload?.sub?.nick || 'Unknown');;
+  const nick = useSelector((state) => state.auth.payload?.sub?.nick || 'Unknown');
   const avatarUrl = useSelector((state) => state.auth.profile?.avatar?.url);
   const isLoggedIn = useSelector((state) => Boolean(state.auth.token));
 
@@ -24,6 +24,7 @@ const ShowLogin = () => {
             src={avatarUrl || '../../logo.png'}
             alt="avatar"
             style={{ width: '50px', borderRadius: '50%', marginRight: '10px' }}
+            onError={(e) => e.target.src = '../../logo.png'}
           />
         </>
       )}
@@ -123,7 +124,11 @@ const ProfileModal = ({ onClose }) => {
         });
   
         const data = await response.json();
-    
+        
+        if (data?.url) {
+          dispatch(setProfile({ avatar: { url: data.url } }));
+        }
+  
       } catch (error) {
         console.error('Error uploading avatar:', error);
       }

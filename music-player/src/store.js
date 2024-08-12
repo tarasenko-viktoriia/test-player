@@ -6,6 +6,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { graphqlRequestBaseQuery } from '@rtk-query/graphql-request-base-query';
 import authSlice, {registerSuccess} from './authSlice'; 
 import playlistReducer from './playlistSlice';
+import libraryReducer from './librarySlice';
 
 export const actionFullLogin = ({ login, password }) => async (dispatch) => {
   try {
@@ -192,6 +193,7 @@ const store = configureStore({
     [authSlice.name]: persistReducer({ key: 'auth', storage }, authSlice.reducer),
     [api.reducerPath]: api.reducer,
     playlists: playlistReducer,
+    library: libraryReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),
