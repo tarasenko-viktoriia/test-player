@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 function TrackUploader({ onTrackUploaded }) {
   const [addTracksToLibrary] = useAddTracksToLibraryMutation();
   
-  // Отримання токену з Redux
   const authToken = useSelector((state) => state.auth.token);
 
   const onDrop = async (acceptedFiles) => {
@@ -19,7 +18,7 @@ function TrackUploader({ onTrackUploaded }) {
       const response = await fetch('http://localhost:4000/upload', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${authToken}`,  // Використання токену з Redux
+          Authorization: `Bearer ${authToken}`, 
         },
         body: formData,
       });
