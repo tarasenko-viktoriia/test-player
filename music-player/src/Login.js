@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import CloseIcon from '@mui/icons-material/Close';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch} from 'react-redux';
 import { login, logout, registerSuccess, setProfile } from "./authSlice";
 import { api, store, actionFullLogin, useUploadAvatarMutation, useSetUserNickMutation } from "./store";
 
@@ -102,6 +102,8 @@ const ProfileModal = ({ onClose }) => {
   const userId = useSelector((state) => state.auth.payload?.sub?.id);
   const dispatch = useDispatch();
 
+  const authToken = useSelector((state) => state.auth.token);
+
   const handleFileChange = (e) => {
     setAvatar(e.target.files[0]);
   };
@@ -116,7 +118,7 @@ const ProfileModal = ({ onClose }) => {
           method: 'POST',
           body: formData,
           headers: {
-            Authorization: `Bearer ${localStorage.authToken}`,
+            Authorization: `Bearer ${authToken}`, 
           },
         });
   
