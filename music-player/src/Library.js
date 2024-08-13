@@ -10,7 +10,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, B
 import {useDeleteTrackMutation, useAddTracksToPlaylistMutation} from './store';
 import { removeTrack } from './librarySlice';
 
-function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists, searchQuery }) {
+function Library({ library, updateTrackInfo, playlists, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
