@@ -7,8 +7,9 @@ const librarySlice = createSlice({
     addTrack(state, action) {
       state.push(action.payload);
     },
+    removeTrack: (state, action) => state.filter(track => track.id !== action.payload),
   },
 });
 
-export const { addTrack } = librarySlice.actions;
+export const { addTrack, removeTrack } = librarySlice.actions;
 export default librarySlice.reducer;

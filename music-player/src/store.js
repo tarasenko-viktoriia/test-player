@@ -180,12 +180,25 @@ const api = createApi({
         variables: { fileIds },
       }),
     }),
+    deleteTrack: builder.mutation({
+      query: ({ id }) => ({
+        document: `
+          mutation deleteTrack($id: ID!) {
+            deleteTrack(id: $id) {
+              id
+            }
+          }
+        `,
+        variables: { id },
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Library', id }],
+    }),
 })
 });
 
 
 
-export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useAddTracksToLibraryMutation} = api;
+export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useAddTracksToLibraryMutation, useDeleteTrackMutation} = api;
 
 const store = configureStore({
   reducer: {

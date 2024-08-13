@@ -7,8 +7,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import {useDeleteTrackMutation} from './store';
+import { removeTrack } from './librarySlice';
 
-function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, playlists, searchQuery }) {
+function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
@@ -17,6 +19,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
   const [newTrackTitle, setNewTrackTitle] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
+  const [deleteTrack] = useDeleteTrackMutation();
 
   const filteredLibrary = library.filter((track) =>
     track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -72,8 +75,13 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
     }
   };
 
-  const handleDeleteTrack = (trackUrl) => {
-    deleteTrack(trackUrl);
+  const handleDeleteTrack = async (trackId) => {
+    try {
+      await deleteTrack({ id: trackId }).unwrap();
+      dispatch(removeTrack(trackId)); 
+    } catch (error) {
+      console.error('Failed to delete track:', error); 
+    }
   };
 
   return (
@@ -97,7 +105,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, deleteTrack, pl
             <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenEdit(track); }}>
               <EditIcon className='icon-button'/>
             </IconButton>
-            <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteTrack(track.url); }}>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteTrack(track.id); }}>
               <DeleteIcon className='icon-button'/>
             </IconButton>
           </div>
