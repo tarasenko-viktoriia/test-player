@@ -211,6 +211,22 @@ const api = createApi({
       }),
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
     }),
+    getPlaylists: builder.query({
+      query: () => ({
+        document: `
+          query getPlaylists {
+            playlists {
+              id
+              title
+              files {
+                id
+                originalname
+              }
+            }
+          }
+        `,
+      }),
+  })
 })
 });
 
@@ -223,7 +239,9 @@ export const { useUploadAvatarMutation,
   useUpdatePlaylistTitleMutation, 
   useAddTracksToLibraryMutation, 
   useDeleteTrackMutation,
-  useAddTracksToPlaylistMutation} = api;
+  useAddTracksToPlaylistMutation,
+  useGetPlaylistsQuery
+} = api;
 
 const store = configureStore({
   reducer: {
