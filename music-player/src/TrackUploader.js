@@ -8,11 +8,19 @@ function TrackUploader({ onTrackUploaded }) {
   const authToken = useSelector((state) => state.auth.token);
 
   const onDrop = async (acceptedFiles) => {
+    const supportedFormats = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
+    const validFiles = acceptedFiles.filter((file) => supportedFormats.includes(file.type));
+  
+    if (validFiles.length === 0) {
+      console.error('No valid audio files to upload.');
+      return;
+    }
+  
     const formData = new FormData();
-    acceptedFiles.forEach((file) => {
+    validFiles.forEach((file) => {
       formData.append('file', file);
     });
-
+  
     try {
       const response = await fetch('http://localhost:4000/upload', {
         method: 'POST',
@@ -22,18 +30,18 @@ function TrackUploader({ onTrackUploaded }) {
         body: formData,
       });
       const data = await response.json();
-
+  
       if (response.ok) {
         const { id, url } = data;
         const track = {
           id,
-          title: acceptedFiles[0].name.split('.').slice(0, -1).join('.'),
+          title: validFiles[0].name.split('.').slice(0, -1).join('.'),
           artist: 'Unknown Artist',
           url,
         };
-
+  
         await addTracksToLibrary([id]);
-
+  
         if (typeof onTrackUploaded === 'function') {
           onTrackUploaded(track);
         } else {
@@ -46,6 +54,7 @@ function TrackUploader({ onTrackUploaded }) {
       console.error("Error uploading file:", error);
     }
   };
+  
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 

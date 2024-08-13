@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { play, pause, nextTrack, prevTrack, setTrackProgress, toggleShuffle, setNormalMode } from './playerSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -11,33 +11,65 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 function Player() {
   const dispatch = useDispatch();
-  const { currentTrack, isPlaying, audio, isShuffle } = useSelector((state) => state.player);
+  const { currentTrack, isPlaying, isShuffle } = useSelector((state) => state.player);
+  const audioRef = useRef(new Audio());
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [showVolumeControl, setShowVolumeControl] = useState(false);
 
   useEffect(() => {
-    if (audio) {
-      const handleTimeUpdate = () => {
-        setCurrentTime(audio.currentTime);
-      };
-      const handleLoadedMetadata = () => {
-        setDuration(audio.duration);
-      };
-      audio.addEventListener('timeupdate', handleTimeUpdate);
-      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-      return () => {
-        audio.removeEventListener('timeupdate', handleTimeUpdate);
-        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      };
+    const audio = audioRef.current;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+  
+    if (currentTrack && currentTrack.url) {
+      const baseURL = 'http://localhost:4000'; 
+      const trackURL = `${baseURL}${currentTrack.url}`;
+      console.log('Current track URL:', trackURL);
+  
+      try {
+        audio.src = trackURL;
+  
+        audio.onerror = (e) => {
+          console.error('Error occurred while setting audio source:', e);
+        };
+  
+        if (isPlaying) {
+          audio.play().catch((error) => {
+            console.error('Error playing audio:', error);
+          });
+        }
+      } catch (error) {
+        console.error('Error setting audio source:', error);
+      }
     }
-  }, [audio]);
+  }, [currentTrack, isPlaying]);
 
   const handlePlayPause = () => {
+    const audio = audioRef.current;
     if (isPlaying) {
+      audio.pause();
       dispatch(pause());
     } else {
+      audio.play();
       dispatch(play());
     }
   };
@@ -52,6 +84,7 @@ function Player() {
 
   const handleProgressChange = (e) => {
     const newTime = e.target.value;
+    const audio = audioRef.current;
     audio.currentTime = newTime;
     setCurrentTime(newTime);
     dispatch(setTrackProgress(newTime));
@@ -59,6 +92,7 @@ function Player() {
 
   const handleVolumeChange = (e) => {
     const newVolume = e.target.value;
+    const audio = audioRef.current;
     audio.volume = newVolume;
     setVolume(newVolume);
   };
