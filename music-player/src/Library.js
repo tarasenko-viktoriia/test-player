@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
-import {useDeleteTrackMutation} from './store';
+import {useDeleteTrackMutation, useAddTracksToPlaylistMutation} from './store';
 import { removeTrack } from './librarySlice';
 
 function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists, searchQuery }) {
@@ -20,6 +20,7 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists, sear
   const [newTrackTitle, setNewTrackTitle] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
   const [deleteTrack] = useDeleteTrackMutation();
+  const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
 
   const filteredLibrary = library.filter((track) =>
     track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -48,10 +49,17 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists, sear
     setSelectedPlaylist('');
   };
 
-  const handleAddToPlaylist = () => {
+  const handleAddToPlaylist = async () => {
     if (selectedTrack && selectedPlaylist) {
-      addTrackToPlaylist(selectedTrack, selectedPlaylist);
-      handleCloseAdd();
+      try {
+        await addTracksToPlaylist({
+          playlistId: selectedPlaylist,
+          fileIds: [selectedTrack.id], 
+        }).unwrap();
+        handleCloseAdd();
+      } catch (error) {
+        console.error('Failed to add track to playlist:', error);
+      }
     }
   };
   const handleClickOpenEdit = (track) => {

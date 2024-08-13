@@ -193,12 +193,37 @@ const api = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Library', id }],
     }),
+    addTracksToPlaylist: builder.mutation({
+      query: ({ playlistId, fileIds }) => ({
+        document: `
+          mutation addTracksToPlaylist($playlistId: ID!, $fileIds: [ID!]!) {
+            addTracksToPlaylist(playlistId: $playlistId, fileIds: $fileIds) {
+              id
+              title
+              files {
+                id
+                originalname
+              }
+            }
+          }
+        `,
+        variables: { playlistId, fileIds },
+      }),
+      invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
+    }),
 })
 });
 
 
 
-export const { useUploadAvatarMutation, useSetUserNickMutation, useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useAddTracksToLibraryMutation, useDeleteTrackMutation} = api;
+export const { useUploadAvatarMutation, 
+  useSetUserNickMutation, 
+  useAddPlaylistMutation, 
+  useDeletePlaylistMutation, 
+  useUpdatePlaylistTitleMutation, 
+  useAddTracksToLibraryMutation, 
+  useDeleteTrackMutation,
+  useAddTracksToPlaylistMutation} = api;
 
 const store = configureStore({
   reducer: {
