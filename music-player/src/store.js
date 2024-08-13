@@ -229,10 +229,55 @@ const api = createApi({
       }),
       providesTags: [{ type: 'Playlist', id: 'LIST' }], 
   }),
+  getFiles: builder.query({
+    query: (userId) => ({
+        document: `
+            query getFiles($userId: ID!) {
+                getFiles(userId: $userId) {
+                    id
+                    originalname
+                    mimetype
+                    url
+                    size
+                }
+            }
+        `,
+        variables: { userId },
+    }),
+    providesTags: [{ type: 'File', id: 'LIST' }],
+  }),
+  deleteFile: builder.mutation({
+      query: ({ id }) => ({
+          document: `
+              mutation deleteFile($id: ID!) {
+                  deleteFile(id: $id) {
+                      id
+                  }
+              }
+          `,
+          variables: { id },
+      }),
+      invalidatesTags: [{ type: 'File', id: 'LIST' }],
+  }),
+  uploadFile: builder.mutation({
+      query: ({ file }) => ({
+          document: `
+              mutation uploadFile($file: Upload!) {
+                  uploadFile(file: $file) {
+                      id
+                      originalname
+                      mimetype
+                      url
+                      size
+                  }
+              }
+          `,
+          variables: { file },
+      }),
+      invalidatesTags: [{ type: 'File', id: 'LIST' }],
+  }),
 })
 });
-
-
 
 export const { useUploadAvatarMutation, 
   useSetUserNickMutation, 
@@ -242,7 +287,10 @@ export const { useUploadAvatarMutation,
   useAddTracksToLibraryMutation, 
   useDeleteTrackMutation,
   useAddTracksToPlaylistMutation,
-  useGetPlaylistsQuery
+  useGetPlaylistsQuery,
+  useGetFilesQuery, 
+  useDeleteFileMutation, 
+  useUploadFileMutation
 } = api;
 
 const store = configureStore({
