@@ -78,9 +78,9 @@ function Library({ library, addTrackToPlaylist, updateTrackInfo, playlists, sear
   const handleDeleteTrack = async (trackId) => {
     try {
       await deleteTrack({ id: trackId }).unwrap();
-      dispatch(removeTrack(trackId)); 
+      dispatch(removeTrack(trackId));
     } catch (error) {
-      console.error('Failed to delete track:', error); 
+      console.error('Failed to delete track:', error);
     }
   };
 
