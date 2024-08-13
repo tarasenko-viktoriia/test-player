@@ -13,6 +13,7 @@ import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTit
 function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
+  const userId = useSelector((state) => state.auth.payload?.sub?.id); // <-- отримання userId
   const [playlistTitle, setPlaylistTitle] = useState('');
   const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
@@ -27,7 +28,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const [deletePlaylist] = useDeletePlaylistMutation();
   const [updatePlaylistTitle] = useUpdatePlaylistTitleMutation();
   
-  const { data: playlistsData, error, isLoading } = useGetPlaylistsQuery(); // <-- виклик useGetPlaylistsQuery
+  const { data: playlistsData, error, isLoading } = useGetPlaylistsQuery(userId); // <-- передача userId
 
   useEffect(() => {
     if (newPlaylistData) {

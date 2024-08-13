@@ -127,18 +127,18 @@ const api = createApi({
     }),
     addPlaylist: builder.mutation({
       query: ({ title, fileIds }) => ({
-        document: `
-          mutation addPlaylist($playlist: PlaylistInput!) {
-            addPlaylist(playlist: $playlist) {
-              id
-              title
-            }
-          }
-        `,
-        variables: { playlist: { title, fileIds } },
+          document: `
+              mutation addPlaylist($playlist: PlaylistInput!) {
+                  addPlaylist(playlist: $playlist) {
+                      id
+                      title
+                  }
+              }
+          `,
+          variables: { playlist: { title, fileIds } },
       }),
-      invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
-    }),
+      invalidatesTags: [{ type: 'Playlist', id: 'LIST' }], // Добавляем invalidatesTags
+  }),
     deletePlaylist: builder.mutation({
       query: ({ id }) => ({
         document: `
@@ -213,21 +213,22 @@ const api = createApi({
     }),
     getPlaylists: builder.query({
       query: (userId) => ({
-        document: `
-          query getPlaylists($userId: ID!) {
-            getPlaylists(userId: $userId) {
-              id
-              title
-              files {
-                id
-                originalname
+          document: `
+              query getPlaylists($userId: ID!) {
+                  getPlaylists(userId: $userId) {
+                      id
+                      title
+                      files {
+                          id
+                          originalname
+                      }
+                  }
               }
-            }
-          }
-        `,
-        variables: { userId },
+          `,
+          variables: { userId },
       }),
-    }),
+      providesTags: [{ type: 'Playlist', id: 'LIST' }], // Добавляем providesTags
+  }),
 })
 });
 
