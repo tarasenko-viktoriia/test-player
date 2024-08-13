@@ -212,10 +212,10 @@ const api = createApi({
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
     }),
     getPlaylists: builder.query({
-      query: () => ({
+      query: (userId) => ({
         document: `
-          query {
-            getPlaylists {
+          query getPlaylists($userId: ID!) {
+            getPlaylists(userId: $userId) {
               id
               title
               files {
@@ -225,8 +225,9 @@ const api = createApi({
             }
           }
         `,
+        variables: { userId },
       }),
-    })
+    }),
 })
 });
 

@@ -119,29 +119,29 @@ function Library({ library, updateTrackInfo, playlists, searchQuery }) {
           </div>
         </div>
       ))}
-      <Dialog open={openAdd} onClose={handleCloseAdd}>
-        <DialogTitle>Add to Playlist</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Select a playlist to add the track.
-          </DialogContentText>
-          <Select
-            value={selectedPlaylist}
-            onChange={(e) => setSelectedPlaylist(e.target.value)}
-            fullWidth
-          >
-            {playlists.map((playlist, index) => (
-              <MenuItem key={index} value={playlist.title}>
-                {playlist.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAdd}>Cancel</Button>
-          <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
-        </DialogActions>
-      </Dialog>
+     <Dialog open={openAdd} onClose={handleCloseAdd}>
+      <DialogTitle>Add to Playlist</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Select a playlist to add the track.
+        </DialogContentText>
+        <Select
+          value={selectedPlaylist}
+          onChange={(e) => setSelectedPlaylist(e.target.value)}
+          fullWidth
+        >
+          {playlists.map((playlist) => (
+            <MenuItem key={playlist.id} value={playlist.id}>
+              {playlist.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseAdd}>Cancel</Button>
+        <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
+      </DialogActions>
+    </Dialog>
       <Dialog open={openEdit} onClose={handleCloseEdit}>
         <DialogTitle>Edit Track Info</DialogTitle>
         <DialogContent>
