@@ -214,8 +214,8 @@ const api = createApi({
     getPlaylists: builder.query({
       query: () => ({
         document: `
-          query getPlaylists {
-            playlists {
+          query {
+            getPlaylists {
               id
               title
               files {
@@ -226,7 +226,7 @@ const api = createApi({
           }
         `,
       }),
-  })
+    })
 })
 });
 

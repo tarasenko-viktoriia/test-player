@@ -8,12 +8,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
-import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation } from './store';
+import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useGetPlaylistsQuery } from './store'; // <-- додано імпорт
 
 function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
-  const playlists = useSelector((state) => state.playlists);
   const [playlistTitle, setPlaylistTitle] = useState('');
   const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
@@ -27,6 +26,8 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const [addPlaylist, { data: newPlaylistData }] = useAddPlaylistMutation();
   const [deletePlaylist] = useDeletePlaylistMutation();
   const [updatePlaylistTitle] = useUpdatePlaylistTitleMutation();
+  
+  const { data: playlistsData, error, isLoading } = useGetPlaylistsQuery(); // <-- виклик useGetPlaylistsQuery
 
   useEffect(() => {
     if (newPlaylistData) {
@@ -108,12 +109,19 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     }
   };
 
-  const filteredPlaylists = playlists?.map((playlist) => ({
+  if (isLoading) {
+    return <div>Loading playlists...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading playlists: {error.message}</div>;
+  }
+
+  const filteredPlaylists = playlistsData?.getPlaylists?.map((playlist) => ({
     ...playlist,
-    tracks: playlist.tracks?.filter(
+    tracks: playlist.files?.filter(
       (track) =>
-        track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        track.artist.toLowerCase().includes(searchQuery.toLowerCase())
+        track.originalname.toLowerCase().includes(searchQuery.toLowerCase())
     ),
   })) || [];
 
@@ -176,7 +184,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
                 {currentTrack && currentTrack.url === track.url && isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
               </span>
               <div className='track-info'>
-                <strong>{track.title}</strong> by {track.artist}
+                <strong>{track.originalname}</strong>
               </div>
               <div className='track-controls'>
                 <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.title, track.url); }}>
@@ -221,7 +229,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
             <DialogContent>
               <TextField
                 margin="dense"
-                label="New Playlist Title"
+                label="Playlist Title"
                 type="text"
                 fullWidth
                 value={newPlaylistTitle}
