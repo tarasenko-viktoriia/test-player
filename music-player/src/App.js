@@ -29,23 +29,6 @@ function App() {
     setLibraryState([...library, track]);
   };
 
-
-  const addTrackToPlaylist = (track, playlistTitle) => {
-    setPlaylistsState((prevPlaylists) => {
-      const updatedPlaylists = prevPlaylists.map((playlist) => {
-        if (playlist.title === playlistTitle) {
-          return {
-            ...playlist,
-            tracks: [...playlist.tracks, track],
-          };
-        }
-        return playlist;
-      });
-      dispatch(setPlaylists(updatedPlaylists));
-      return updatedPlaylists;
-    });
-  };
-
   const removeTrackFromPlaylist = (playlistTitle, trackUrl) => {
     setPlaylistsState((prevPlaylists) => {
       const updatedPlaylists = prevPlaylists.map((playlist) => {
@@ -60,7 +43,6 @@ function App() {
       return updatedPlaylists;
     });
   };
-
 
   const updateTrackInfo = (url, newTitle, newArtist) => {
     setLibraryState((prevLibrary) => prevLibrary.map(track => {
@@ -126,7 +108,6 @@ function App() {
               <>
                 <Library
                   library={library}
-                  addTrackToPlaylist={addTrackToPlaylist}
                   updateTrackInfo={updateTrackInfo}
                   playlists={playlists}
                   searchQuery={searchQuery}
