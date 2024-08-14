@@ -9,8 +9,9 @@ import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import {useDeleteTrackMutation, useAddTracksToPlaylistMutation} from './store';
 import { removeTrack } from './librarySlice';
+import { useGetFilesQuery } from './store';
 
-function Library({ library, updateTrackInfo, playlists, searchQuery }) {
+function Library({ updateTrackInfo, playlists, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
@@ -21,12 +22,14 @@ function Library({ library, updateTrackInfo, playlists, searchQuery }) {
   const [newArtistName, setNewArtistName] = useState('');
   const [deleteTrack] = useDeleteTrackMutation();
   const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
+  const userId = useSelector((state) => state.auth.payload?.sub?.id);
 
-  const filteredLibrary = library.filter((track) =>
-    track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    track.artist.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
+const { data: libraryData = {}, error, isLoading } = useGetFilesQuery(userId);
+const library = libraryData.getFiles || [];
+
+const filteredLibrary = library.filter((track) =>
+  track.originalname.toLowerCase().includes(searchQuery.toLowerCase())
+);
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
@@ -37,6 +40,7 @@ function Library({ library, updateTrackInfo, playlists, searchQuery }) {
       dispatch(play());
     }
   };
+
 
   const handleClickOpenAdd = (track) => {
     setSelectedTrack(track);
@@ -94,8 +98,10 @@ function Library({ library, updateTrackInfo, playlists, searchQuery }) {
 
   return (
     <div className='track-container'>
+      {isLoading && <p>Loading tracks...</p>}
+      {error && <p>Error loading tracks: {error.message}</p>}
       {filteredLibrary.map((track, index) => (
-        <div 
+        <div
           className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`} 
           key={index} 
           onClick={() => handlePlayPause(track, index)}
@@ -104,7 +110,7 @@ function Library({ library, updateTrackInfo, playlists, searchQuery }) {
             {currentTrack && currentTrack.url === track.url && isPlaying ? <PauseIcon/> : <PlayArrowIcon/>}
           </span>
           <div className='track-info'>
-            <strong>{track.title}</strong> by {track.artist}
+            <strong>{track.originalname}</strong>
           </div>
           <div className='track-controls'>
             <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
