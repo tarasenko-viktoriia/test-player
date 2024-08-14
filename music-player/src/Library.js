@@ -68,7 +68,7 @@ const filteredLibrary = library.filter((track) =>
   };
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
-    setNewTrackTitle(track.title);
+    setNewTrackTitle(track.originalname);
     setNewArtistName(track.artist);
     setOpenEdit(true);
   };
@@ -110,6 +110,7 @@ const filteredLibrary = library.filter((track) =>
           </span>
           <div className='track-info'>
             <strong>{track.originalname}</strong>
+            <strong>{track.artist}</strong>
           </div>
           <div className='track-controls'>
             <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>

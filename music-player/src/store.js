@@ -236,6 +236,7 @@ const api = createApi({
                 getFiles(userId: $userId) {
                     id
                     originalname
+                    artist
                     mimetype
                     url
                     size
@@ -266,6 +267,7 @@ const api = createApi({
                   uploadFile(file: $file) {
                       id
                       originalname
+                      artist
                       mimetype
                       url
                       size
