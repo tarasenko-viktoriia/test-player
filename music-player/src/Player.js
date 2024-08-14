@@ -45,32 +45,31 @@ function Player() {
       const trackURL = `${baseURL}${currentTrack.url}`;
       console.log('Current track URL:', trackURL);
   
-      try {
+      const loadAndPlay = () => {
         audio.src = trackURL;
+        audio.play().catch((error) => {
+          console.error('Error playing audio:', error);
+        });
+      };
   
-        audio.onerror = (e) => {
-          console.error('Error occurred while setting audio source:', e);
-        };
+      audio.pause();
+      audio.src = '';
   
-        if (isPlaying) {
-          audio.play().catch((error) => {
-            console.error('Error playing audio:', error);
-          });
-        }
-      } catch (error) {
-        console.error('Error setting audio source:', error);
-      }
+      setTimeout(loadAndPlay, 100);
     }
   }, [currentTrack, isPlaying]);
 
   const handlePlayPause = () => {
     const audio = audioRef.current;
-    if (isPlaying) {
+  
+    if (audio.paused && currentTrack && currentTrack.url) {
+      audio.play().catch((error) => {
+        console.error('Error playing audio:', error);
+      });
+      dispatch(play());
+    } else {
       audio.pause();
       dispatch(pause());
-    } else {
-      audio.play();
-      dispatch(play());
     }
   };
 
@@ -123,7 +122,7 @@ function Player() {
             <img className={isPlaying ? 'spin' : ''} src='../image/player-image.png' width="100px"></img>
           </div>
           <div className='track-id3'>
-            <h2> {currentTrack.title}</h2>
+            <h2> {currentTrack.originalname}</h2>
             <h3> {currentTrack.artist}</h3>
           </div>
           <div className="player-controls-container">
