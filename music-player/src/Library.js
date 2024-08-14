@@ -110,7 +110,7 @@ const filteredLibrary = library.filter((track) =>
           </span>
           <div className='track-info'>
             <strong>{track.originalname}</strong>
-            <strong>{track.artist}</strong>
+            <strong className='artist'>{track.artist || 'Unknown Artist '}</strong>
           </div>
           <div className='track-controls'>
             <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>

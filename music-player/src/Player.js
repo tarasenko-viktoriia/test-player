@@ -123,7 +123,7 @@ function Player() {
           </div>
           <div className='track-id3'>
             <h2> {currentTrack.originalname}</h2>
-            <h3> {currentTrack.artist}</h3>
+            <h3> {currentTrack.artist || 'Unknown Artist '}</h3>
           </div>
           <div className="player-controls-container">
             <div className="volume-control-wrapper">
