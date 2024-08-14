@@ -182,10 +182,13 @@ a {
 .track-info {
   flex-grow: 1;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 5px;
 }
-
+.artist{
+  color: rgb(150, 133, 173);
+  font-weight: 400;
+}
 .track-controls {
   display: flex;
   align-items: center; 
@@ -204,7 +207,7 @@ a {
 
 /* dropzone */
 .dropzone{
-  background-color: rgba(147, 128, 173, 0.637);
+  background: linear-gradient(135deg, rgba(130, 107, 158, 0.5) 0%, rgba(130, 107, 158, 0.5) 20%, rgba(46, 38, 56, 0.712) 80%, rgba(46, 38, 56, 0.712) 100%);
   border-radius: 20px;
   padding: 20px;
   margin: 10px 5px 0 5px;
@@ -217,7 +220,8 @@ a {
 /* Player */
 .player {
   font-family: Poppins;
-  background-color: rgba(147, 128, 173, 0.637);
+  background: linear-gradient(135deg, rgba(130, 107, 158, 0.5) 0%, rgba(130, 107, 158, 0.5) 20%, rgba(46, 38, 56, 0.712) 80%, rgba(46, 38, 56, 0.712) 100%);
+  box-shadow: 0px 0px 10px 3px rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 15px;
   text-align: center;
@@ -240,13 +244,13 @@ a {
 }
 .player h2 {
   font-weight: 500;
-  font-size: 18px;
+  font-size: 16px;
   margin: 0;
 }
 .player h3 {
   color: #C8C8C8;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 14px;
   margin: 0;
 }
 .input-duration {
