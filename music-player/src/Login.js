@@ -31,7 +31,7 @@ const ShowLogin = () => {
       <div>
         <div>Hi, {login}!</div>
         {isLoggedIn && (
-          <div>Nickname: {nick}</div>
+          <div className='nick-container'>Nickname: {nick}</div>
         )}
       </div>
     </div>

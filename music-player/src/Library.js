@@ -99,7 +99,6 @@ const filteredLibrary = library.filter((track) =>
   return (
     <div className='track-container'>
       {isLoading && <p>Loading tracks...</p>}
-      {error && <p>Error loading tracks: {error.message}</p>}
       {filteredLibrary.map((track, index) => (
         <div
           className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`} 

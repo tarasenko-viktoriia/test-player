@@ -114,10 +114,6 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     return <div>Loading playlists...</div>;
   }
 
-  if (error) {
-    return <div>Error loading playlists: {error.message}</div>;
-  }
-
   const filteredPlaylists = playlistsData?.getPlaylists?.map((playlist) => ({
     ...playlist,
     tracks: playlist.files?.filter(
