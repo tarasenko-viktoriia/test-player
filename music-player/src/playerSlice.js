@@ -64,9 +64,12 @@ const playerSlice = createSlice({
     setNormalMode: (state) => {
       state.isShuffle = false;
     },
+    removeTrack: (state, action) => {
+      state.tracks = state.tracks.filter(track => track.id !== action.payload);
+    },
   },
 });
 
-export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause, setTrackProgress, toggleShuffle, setNormalMode } = playerSlice.actions;
+export const { setTrack, play, pause, setLibrary, setPlaylists, nextTrack, prevTrack, togglePlayPause, setTrackProgress, toggleShuffle, setNormalMode, removeTrack } = playerSlice.actions;
 
 export default playerSlice.reducer;

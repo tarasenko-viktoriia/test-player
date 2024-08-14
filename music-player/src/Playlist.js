@@ -173,7 +173,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
           <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
           <h3>{selectedPlaylist.title}</h3>
           {selectedPlaylist.tracks?.map((track, trackIndex) => (
-            <div className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`}
+            <div className={track `${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`}
               key={trackIndex}
               onClick={() => handlePlayPause(track, trackIndex, selectedPlaylist)}
             >

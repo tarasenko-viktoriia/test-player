@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setTrack, play, pause, togglePlayPause } from './playerSlice';
+import { setTrack, play, pause, togglePlayPause, removeTrack } from './playerSlice'; // Додайте імпорт removeTrack
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
-import {useDeleteTrackMutation, useAddTracksToPlaylistMutation} from './store';
-import { removeTrack } from './librarySlice';
-import { useGetFilesQuery } from './store';
+import { useDeleteTrackMutation, useAddTracksToPlaylistMutation, useGetPlaylistsQuery, useGetFilesQuery } from './store';
 
-function Library({ updateTrackInfo, playlists, searchQuery }) {
+function Library({ updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
@@ -24,12 +22,15 @@ function Library({ updateTrackInfo, playlists, searchQuery }) {
   const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
   const userId = useSelector((state) => state.auth.payload?.sub?.id);
 
-const { data: libraryData = {}, error, isLoading } = useGetFilesQuery(userId);
-const library = libraryData.getFiles || [];
+  const { data: libraryData = {}, error, isLoading } = useGetFilesQuery(userId);
+  const { data: playlistsData = [], isLoading: isLoadingPlaylists } = useGetPlaylistsQuery(userId);
 
-const filteredLibrary = library.filter((track) =>
-  track.originalname.toLowerCase().includes(searchQuery.toLowerCase())
-);
+  const library = libraryData.getFiles || [];
+  const playlists = playlistsData.getPlaylists || [];
+
+  const filteredLibrary = library.filter((track) =>
+    track.originalname.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
@@ -40,7 +41,6 @@ const filteredLibrary = library.filter((track) =>
       dispatch(play());
     }
   };
-
 
   const handleClickOpenAdd = (track) => {
     setSelectedTrack(track);
@@ -58,7 +58,7 @@ const filteredLibrary = library.filter((track) =>
       try {
         await addTracksToPlaylist({
           playlistId: selectedPlaylist,
-          fileIds: [selectedTrack.id], 
+          fileIds: [selectedTrack.id],
         }).unwrap();
         handleCloseAdd();
       } catch (error) {
@@ -66,6 +66,7 @@ const filteredLibrary = library.filter((track) =>
       }
     }
   };
+
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
     setNewTrackTitle(track.originalname);
@@ -90,7 +91,7 @@ const filteredLibrary = library.filter((track) =>
   const handleDeleteTrack = async (trackId) => {
     try {
       await deleteTrack({ id: trackId }).unwrap();
-      dispatch(removeTrack(trackId));
+      dispatch(removeTrack(trackId)); // Виклик дію для видалення треку
     } catch (error) {
       console.error('Failed to delete track:', error);
     }
@@ -99,6 +100,7 @@ const filteredLibrary = library.filter((track) =>
   return (
     <div className='track-container'>
       {isLoading && <p>Loading tracks...</p>}
+      {isLoadingPlaylists && <p>Loading playlists...</p>}
       {filteredLibrary.map((track, index) => (
         <div
           className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`} 
@@ -110,7 +112,7 @@ const filteredLibrary = library.filter((track) =>
           </span>
           <div className='track-info'>
             <strong>{track.originalname}</strong>
-            <strong className='artist'>{track.artist || 'Unknown Artist '}</strong>
+            <strong>{track.artist}</strong>
           </div>
           <div className='track-controls'>
             <IconButton onClick={(e) => { e.stopPropagation(); handleClickOpenAdd(track); }}>
@@ -125,29 +127,29 @@ const filteredLibrary = library.filter((track) =>
           </div>
         </div>
       ))}
-     <Dialog open={openAdd} onClose={handleCloseAdd}>
-      <DialogTitle>Add to Playlist</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Select a playlist to add the track.
-        </DialogContentText>
-        <Select
-          value={selectedPlaylist}
-          onChange={(e) => setSelectedPlaylist(e.target.value)}
-          fullWidth
-        >
-          {playlists.map((playlist) => (
-            <MenuItem key={playlist.id} value={playlist.id}>
-              {playlist.title}
-            </MenuItem>
-          ))}
-        </Select>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseAdd}>Cancel</Button>
-        <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
-      </DialogActions>
-    </Dialog>
+      <Dialog open={openAdd} onClose={handleCloseAdd}>
+       <DialogTitle>Add to Playlist</DialogTitle>
+       <DialogContent>
+         <DialogContentText>
+           Select a playlist to add the track.
+         </DialogContentText>
+         <Select
+           value={selectedPlaylist}
+           onChange={(e) => setSelectedPlaylist(e.target.value)}
+           fullWidth
+         >
+           {playlists.map((playlist) => (
+             <MenuItem key={playlist.id} value={playlist.id}>
+               {playlist.title}
+             </MenuItem>
+           ))}
+         </Select>
+       </DialogContent>
+       <DialogActions>
+         <Button onClick={handleCloseAdd}>Cancel</Button>
+         <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
+       </DialogActions>
+     </Dialog>
       <Dialog open={openEdit} onClose={handleCloseEdit}>
         <DialogTitle>Edit Track Info</DialogTitle>
         <DialogContent>
