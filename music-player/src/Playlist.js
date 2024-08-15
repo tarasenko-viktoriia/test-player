@@ -114,10 +114,6 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading playlists...</div>;
-  }
-
   const filteredPlaylists = playlistsData?.getPlaylists?.map((playlist) => ({
     ...playlist,
     tracks: playlist.files?.filter(

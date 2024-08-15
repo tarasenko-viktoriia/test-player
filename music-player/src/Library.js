@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
-import { useDeleteTrackMutation, useAddTracksToPlaylistMutation, useGetPlaylistsQuery, useGetFilesQuery } from './store';
+import { useDeleteTrackMutation, useGetPlaylistsQuery, useGetFilesQuery, useAddTracksToPlaylistMutation } from './store';
 
 function Library({ updateTrackInfo, searchQuery }) {
   const dispatch = useDispatch();
@@ -19,9 +19,9 @@ function Library({ updateTrackInfo, searchQuery }) {
   const [newTrackTitle, setNewTrackTitle] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
   const [deleteTrack] = useDeleteTrackMutation();
-  const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
   const { data: libraryData = {}, isLoading } = useGetFilesQuery();
   const { data: playlistsData = [], isLoading: isLoadingPlaylists } = useGetPlaylistsQuery();
+  const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
 
   const library = libraryData.getFiles || [];
   const playlists = playlistsData.getPlaylists || [];
@@ -51,20 +51,6 @@ function Library({ updateTrackInfo, searchQuery }) {
     setSelectedPlaylist('');
   };
 
-  const handleAddToPlaylist = async () => {
-    if (selectedTrack && selectedPlaylist) {
-      try {
-        await addTracksToPlaylist({
-          playlistId: selectedPlaylist,
-          fileIds: [selectedTrack.id],
-        }).unwrap();
-        handleCloseAdd();
-      } catch (error) {
-        console.error('Failed to add track to playlist:', error);
-      }
-    }
-  };
-
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
     setNewTrackTitle(track.originalname);
@@ -92,6 +78,17 @@ function Library({ updateTrackInfo, searchQuery }) {
       dispatch(removeTrack(trackId));
     } catch (error) {
       console.error('Failed to delete track:', error);
+    }
+  };
+  
+  const handleAddTrackToPlaylist = async () => {
+    if (selectedPlaylist && selectedTrack) {
+      try {
+        await addTracksToPlaylist({ playlistId: selectedPlaylist, fileIds: [selectedTrack.id] });
+        handleCloseAdd();
+      } catch (error) {
+        console.error('Ошибка при добавлении трека в плейлист:', error);
+      }
     }
   };
 
@@ -126,28 +123,26 @@ function Library({ updateTrackInfo, searchQuery }) {
         </div>
       ))}
       <Dialog open={openAdd} onClose={handleCloseAdd}>
-       <DialogTitle>Add to Playlist</DialogTitle>
-       <DialogContent>
-         <DialogContentText>
-           Select a playlist to add the track.
-         </DialogContentText>
-         <Select
-           value={selectedPlaylist}
-           onChange={(e) => setSelectedPlaylist(e.target.value)}
-           fullWidth
-         >
-           {playlists.map((playlist) => (
-             <MenuItem key={playlist.id} value={playlist.id}>
-               {playlist.title}
-             </MenuItem>
-           ))}
-         </Select>
-       </DialogContent>
-       <DialogActions>
-         <Button onClick={handleCloseAdd}>Cancel</Button>
-         <Button onClick={handleAddToPlaylist} color="primary">Add</Button>
-       </DialogActions>
-     </Dialog>
+        <DialogTitle>Add to Playlist</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Select a playlist to add the track.</DialogContentText>
+          <Select
+            value={selectedPlaylist}
+            onChange={(e) => setSelectedPlaylist(e.target.value)}
+            fullWidth
+          >
+            {playlists.map((playlist) => (
+              <MenuItem key={playlist.id} value={playlist.id}>
+                {playlist.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAdd}>Cancel</Button>
+          <Button onClick={handleAddTrackToPlaylist} color="primary">Add</Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={openEdit} onClose={handleCloseEdit}>
         <DialogTitle>Edit Track Info</DialogTitle>
         <DialogContent>
