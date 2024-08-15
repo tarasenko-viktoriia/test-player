@@ -126,7 +126,7 @@ const api = createApi({
       invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
     }),
     addPlaylist: builder.mutation({
-      query: ({ title, fileId }) => ({
+      query: ({ title, fileIds }) => ({
           document: `
               mutation addPlaylist($playlist: PlaylistInput!) {
                   addPlaylist(playlist: $playlist) {
@@ -135,7 +135,7 @@ const api = createApi({
                   }
               }
           `,
-          variables: { playlist: { title, fileId } },
+          variables: { playlist: { title, fileIds } },
       }),
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
   }),
@@ -167,17 +167,17 @@ const api = createApi({
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }], 
     }),
     addTracksToLibrary: builder.mutation({
-      query: (fileId) => ({
+      query: (fileIds) => ({
         document: `
-          mutation addTracksToLibrary($fileId: [ID!]!) {
-            addTracksToLibrary(fileId: $fileId) {
+          mutation addTracksToLibrary($fileIds: [ID!]!) {
+            addTracksToLibrary(fileIds: $fileIds) {
               id
               originalname
               url
             }
           }
         `,
-        variables: { fileId },
+        variables: { fileIds },
       }),
     }),
     deleteTrack: builder.mutation({
@@ -194,10 +194,10 @@ const api = createApi({
       invalidatesTags: (result, error, { id }) => [{ type: 'Library', id }],
     }),
     addTracksToPlaylist: builder.mutation({
-      query: ({ playlistId, fileId }) => ({
+      query: ({ playlistId, fileIds }) => ({
         document: `
-          mutation addTracksToPlaylist($playlistId: ID!, $fileId: [ID!]!) {
-            addTracksToPlaylist(playlistId: $playlistId, fileId: $fileId) {
+          mutation addTracksToPlaylist($playlistId: ID!, $fileIds: [ID!]!) {
+            addTracksToPlaylist(playlistId: $playlistId, fileIds: $fileIds) {
               id
               title
               files {
@@ -207,7 +207,7 @@ const api = createApi({
             }
           }
         `,
-        variables: { playlistId, fileId },
+        variables: { playlistId, fileIds },
       }),
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
     }),

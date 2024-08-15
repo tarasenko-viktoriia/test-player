@@ -56,7 +56,7 @@ function Library({ updateTrackInfo, searchQuery }) {
       try {
         await addTracksToPlaylist({
           playlistId: selectedPlaylist,
-          fileId: [selectedTrack.id],
+          fileIds: [selectedTrack.id],
         }).unwrap();
         handleCloseAdd();
       } catch (error) {
