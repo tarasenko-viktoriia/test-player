@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   currentTrack: null,
   isPlaying: false,
-  library: [],
+  library: [], 
   playlists: [],
   currentIndex: -1,
   currentContext: 'library', 
@@ -65,7 +65,7 @@ const playerSlice = createSlice({
       state.isShuffle = false;
     },
     removeTrack: (state, action) => {
-      state.tracks = state.tracks.filter(track => track.id !== action.payload);
+      state.library = state.library.filter(track => track.id !== action.payload);
     },
   },
 });

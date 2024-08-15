@@ -40,10 +40,10 @@ function TrackUploader({ onTrackUploaded }) {
           url,
         };
   
-        await addTracksToLibrary([id]);
+        await addTracksToLibrary([id]).unwrap(); 
   
         if (typeof onTrackUploaded === 'function') {
-          onTrackUploaded(track);
+          onTrackUploaded(track); 
         } else {
           console.error('onTrackUploaded is not a function');
         }
@@ -65,6 +65,5 @@ function TrackUploader({ onTrackUploaded }) {
     </div>
   );
 }
-
 
 export default TrackUploader;

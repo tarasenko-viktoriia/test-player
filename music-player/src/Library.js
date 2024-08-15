@@ -22,6 +22,7 @@ function Library({ updateTrackInfo, searchQuery }) {
   const { data: libraryData = {}, isLoading } = useGetFilesQuery();
   const { data: playlistsData = [], isLoading: isLoadingPlaylists } = useGetPlaylistsQuery();
   const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
+  const { refetch } = useGetFilesQuery();
 
   const library = libraryData.getFiles || [];
   const playlists = playlistsData.getPlaylists || [];
@@ -76,6 +77,7 @@ function Library({ updateTrackInfo, searchQuery }) {
     try {
       await deleteTrack({ id: trackId }).unwrap();
       dispatch(removeTrack(trackId));
+      refetch();
     } catch (error) {
       console.error('Failed to delete track:', error);
     }

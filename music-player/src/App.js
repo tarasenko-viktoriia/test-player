@@ -8,6 +8,7 @@ import Player from './Player';
 import { setLibrary, setPlaylists, setTrack } from './playerSlice';
 import Login from './Login';
 import './App.css';
+import { useGetFilesQuery} from './store';
 
 function App() {
   const [library, setLibraryState] = useState([]);
@@ -16,6 +17,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
   const currentTrack = useSelector((state) => state.player.currentTrack);
+  const { refetch } = useGetFilesQuery();
 
   useEffect(() => {
     dispatch(setLibrary(library));
@@ -25,9 +27,6 @@ function App() {
     dispatch(setPlaylists(playlists));
   }, [playlists, dispatch]);
 
-  const addTrackToLibrary = (track) => {
-    setLibraryState([...library, track]);
-  };
 
   const removeTrackFromPlaylist = (playlistTitle, trackUrl) => {
     setPlaylistsState((prevPlaylists) => {
@@ -73,6 +72,10 @@ function App() {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
+
+  const handleTrackUploaded = (newTrack) => {
+    refetch();
+  }
 
   return (
     <Provider store={store}>
@@ -127,7 +130,7 @@ function App() {
           <div className='sidebar-right'>
             <Login/>
             <Player />
-            <TrackUploader className="dropzone" onTrackUploaded={addTrackToLibrary} />
+            <TrackUploader className="dropzone" onTrackUploaded={handleTrackUploaded} />
           </div>
         </div>
       </div>
