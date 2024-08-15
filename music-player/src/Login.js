@@ -15,26 +15,26 @@ const ShowLogin = () => {
   const isLoggedIn = useSelector((state) => Boolean(state.auth.token));
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      {isLoggedIn && (
-        <>
-          <img
-            src={avatarUrl || '../../logo.png'}
-            alt="avatar"
-            style={{ width: '50px', borderRadius: '50%', marginRight: '10px' }}
-            onError={(e) => e.target.src = '../../logo.png'}
-          />
-        </>
-      )}
-      <div>
-        <div>Hi, {login}!</div>
-        {isLoggedIn && (
-          <div className='nick-container'>Nickname: {nick}</div>
-        )}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+          {isLoggedIn && (
+              <>
+                  <img
+                      src={avatarUrl || '../../logo.png'}
+                      alt="avatar"
+                      style={{ width: '50px', borderRadius: '50%', marginRight: '10px' }}
+                      onError={(e) => e.target.src = '../../logo.png'}
+                  />
+                  <div>
+                      <div>Hi, {login}!</div>
+                      {isLoggedIn && (
+                          <div className='nick-container'>Nickname: {nick}</div>
+                      )}
+                  </div>
+              </>
+          )}
       </div>
-    </div>
   );
-};
+}
 
 
 const Logout = () => {
@@ -97,8 +97,8 @@ const RegisterForm = ({ onClose }) => {
 const ProfileModal = ({ onClose }) => {
   const [nick, setNick] = useState('');
   const [avatar, setAvatar] = useState(null);
-  const [uploadAvatar, { isLoading: isAvatarLoading }] = useUploadAvatarMutation();
-  const [setUserNick, { isLoading: isNickLoading }] = useSetUserNickMutation();
+  const [uploadAvatar] = useUploadAvatarMutation();
+  const [setUserNick] = useSetUserNickMutation();
   const userId = useSelector((state) => state.auth.payload?.sub?.id);
   const dispatch = useDispatch();
   const authToken = useSelector((state) => state.auth.token);
@@ -108,10 +108,12 @@ const ProfileModal = ({ onClose }) => {
   };
 
   const handleUpload = async () => {
+    let avatarUrl = '';
+
     if (avatar) {
       const formData = new FormData();
       formData.append('file', avatar);
-  
+
       try {
         const response = await fetch('http://localhost:4000/upload', {
           method: 'POST',
@@ -120,10 +122,11 @@ const ProfileModal = ({ onClose }) => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-  
+
         const data = await response.json();
-  
+
         if (data?.url) {
+          avatarUrl = data.url;
           const result = await uploadAvatar({ avatarId: data.id }).unwrap();
           if (result?.setAvatar?.avatars?.length > 0) {
             dispatch(setProfile({ avatar: result.setAvatar.avatars[0] }));
@@ -133,14 +136,18 @@ const ProfileModal = ({ onClose }) => {
         console.error('Error uploading avatar:', error);
       }
     }
-  
+
     if (nick) {
-      const result = await setUserNick({ id: userId, nick });
-      if (result.data?.updateUserNick?.nick) {
-        dispatch(setProfile({ nick: result.data.updateUserNick.nick }));
+      try {
+        const result = await setUserNick({ id: userId, nick }).unwrap();
+        if (result?.updateUserNick?.nick) {
+          dispatch(setProfile({ nick: result.updateUserNick.nick }));
+        }
+      } catch (error) {
+        console.error('Error updating nickname:', error);
       }
     }
-  
+
     onClose();
   };
 
@@ -160,7 +167,7 @@ const ProfileModal = ({ onClose }) => {
       />
       <Button
         onClick={handleUpload}
-        disabled={isAvatarLoading || isNickLoading}
+        disabled={!nick && !avatar}
         variant="contained"
         color="primary"
       >
@@ -169,7 +176,6 @@ const ProfileModal = ({ onClose }) => {
     </div>
   );
 };
-
 
 const LoginForm = ({ onClose }) => {
   const [login, setLogin] = useState('');
