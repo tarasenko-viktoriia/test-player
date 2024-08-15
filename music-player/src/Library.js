@@ -68,7 +68,7 @@ function Library({ updateTrackInfo, searchQuery }) {
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
     setNewTrackTitle(track.originalname);
-    setNewArtistName(track.artist);
+    setNewArtistName(track.artist || "Unknown Artist");
     setOpenEdit(true);
   };
 
