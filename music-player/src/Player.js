@@ -43,19 +43,15 @@ function Player() {
     if (currentTrack && currentTrack.url) {
       const baseURL = 'http://localhost:4000'; 
       const trackURL = `${baseURL}${currentTrack.url}`;
-      console.log('Current track URL:', trackURL);
+      
+      audio.pause();
+      audio.src = trackURL;
   
-      const loadAndPlay = () => {
-        audio.src = trackURL;
+      if (isPlaying) {
         audio.play().catch((error) => {
           console.error('Error playing audio:', error);
         });
-      };
-  
-      audio.pause();
-      audio.src = '';
-  
-      setTimeout(loadAndPlay, 100);
+      }
     }
   }, [currentTrack, isPlaying]);
 
@@ -66,10 +62,10 @@ function Player() {
       audio.play().catch((error) => {
         console.error('Error playing audio:', error);
       });
-      dispatch(play());
+      dispatch(play()); 
     } else {
       audio.pause();
-      dispatch(pause());
+      dispatch(pause()); 
     }
   };
 
