@@ -14,8 +14,6 @@ const ShowLogin = () => {
   const avatarUrl = useSelector((state) => state.auth.profile?.avatar?.url);
   const isLoggedIn = useSelector((state) => Boolean(state.auth.token));
 
-  console.log('Login:', login, 'Nickname:', nick, 'Avatar URL:', avatarUrl, 'Is Logged In:', isLoggedIn);
-
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {isLoggedIn && (
@@ -37,6 +35,7 @@ const ShowLogin = () => {
     </div>
   );
 };
+
 
 const Logout = () => {
   const dispatch = useDispatch();
@@ -102,7 +101,6 @@ const ProfileModal = ({ onClose }) => {
   const [setUserNick, { isLoading: isNickLoading }] = useSetUserNickMutation();
   const userId = useSelector((state) => state.auth.payload?.sub?.id);
   const dispatch = useDispatch();
-
   const authToken = useSelector((state) => state.auth.token);
 
   const handleFileChange = (e) => {
@@ -119,16 +117,18 @@ const ProfileModal = ({ onClose }) => {
           method: 'POST',
           body: formData,
           headers: {
-            Authorization: `Bearer ${authToken}`, 
+            Authorization: `Bearer ${authToken}`,
           },
         });
   
         const data = await response.json();
-        
-        if (data?.url) {
-          dispatch(setProfile({ avatar: { url: data.url }}));
-        }
   
+        if (data?.url) {
+          const result = await uploadAvatar({ avatarId: data.id }).unwrap();
+          if (result?.setAvatar?.avatars?.length > 0) {
+            dispatch(setProfile({ avatar: result.setAvatar.avatars[0] }));
+          }
+        }
       } catch (error) {
         console.error('Error uploading avatar:', error);
       }
@@ -143,25 +143,25 @@ const ProfileModal = ({ onClose }) => {
   
     onClose();
   };
-  
+
   return (
     <div>
-      <TextField 
-        value={nick} 
-        onChange={(e) => setNick(e.target.value)} 
-        label="New Nickname" 
-        variant="outlined" 
-        fullWidth 
+      <TextField
+        value={nick}
+        onChange={(e) => setNick(e.target.value)}
+        label="New Nickname"
+        variant="outlined"
+        fullWidth
         margin="normal"
       />
-      <input 
-        type="file" 
-        onChange={handleFileChange} 
+      <input
+        type="file"
+        onChange={handleFileChange}
       />
-      <Button 
-        onClick={handleUpload} 
+      <Button
+        onClick={handleUpload}
         disabled={isAvatarLoading || isNickLoading}
-        variant="contained" 
+        variant="contained"
         color="primary"
       >
         Save Changes
@@ -169,6 +169,7 @@ const ProfileModal = ({ onClose }) => {
     </div>
   );
 };
+
 
 const LoginForm = ({ onClose }) => {
   const [login, setLogin] = useState('');
