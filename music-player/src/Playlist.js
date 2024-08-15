@@ -170,8 +170,10 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
         </>
       ) : (
         <div className='playlist-container'>
-          <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
-          <h3>{selectedPlaylist.title}</h3>
+          <div style={{ display: "flex", gap: "20px", alignItems:"center", paddingBottom:"20px" }}>
+            <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
+            <h3>{selectedPlaylist.title}</h3>
+          </div>
           {selectedPlaylist.tracks?.map((track, trackIndex) => (
             <div className={`track ${currentTrack && currentTrack.url === track.url && isPlaying ? 'playing' : ''}`}
               key={trackIndex}
