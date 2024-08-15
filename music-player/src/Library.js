@@ -20,10 +20,8 @@ function Library({ updateTrackInfo, searchQuery }) {
   const [newArtistName, setNewArtistName] = useState('');
   const [deleteTrack] = useDeleteTrackMutation();
   const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
-  const userId = useSelector((state) => state.auth.payload?.sub?.id);
-
-  const { data: libraryData = {}, error, isLoading } = useGetFilesQuery(userId);
-  const { data: playlistsData = [], isLoading: isLoadingPlaylists } = useGetPlaylistsQuery(userId);
+  const { data: libraryData = {}, isLoading } = useGetFilesQuery();
+  const { data: playlistsData = [], isLoading: isLoadingPlaylists } = useGetPlaylistsQuery();
 
   const library = libraryData.getFiles || [];
   const playlists = playlistsData.getPlaylists || [];

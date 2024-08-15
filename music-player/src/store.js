@@ -211,42 +211,6 @@ const api = createApi({
       }),
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
     }),
-    getPlaylists: builder.query({
-      query: (userId) => ({
-          document: `
-              query getPlaylists($userId: ID!) {
-                  getPlaylists(userId: $userId) {
-                      id
-                      title
-                      files {
-                          id
-                          originalname
-                      }
-                  }
-              }
-          `,
-          variables: { userId },
-      }),
-      providesTags: [{ type: 'Playlist', id: 'LIST' }], 
-  }),
-  getFiles: builder.query({
-    query: (userId) => ({
-        document: `
-            query getFiles($userId: ID!) {
-                getFiles(userId: $userId) {
-                    id
-                    originalname
-                    artist
-                    mimetype
-                    url
-                    size
-                }
-            }
-        `,
-        variables: { userId },
-    }),
-    providesTags: [{ type: 'File', id: 'LIST' }],
-  }),
   deleteFile: builder.mutation({
       query: ({ id }) => ({
           document: `
@@ -278,6 +242,54 @@ const api = createApi({
       }),
       invalidatesTags: [{ type: 'File', id: 'LIST' }],
   }),
+  getPlaylists: builder.query({
+    query: () => ({
+      document: `
+        query getPlaylists {
+          getPlaylists {
+            id
+            title
+            files {
+              id
+              originalname
+              artist
+              url
+            }
+          }
+        }
+      `,
+    }),
+    providesTags: (result) => {
+      if (!result || !result.getPlaylists) {
+        return [{ type: 'Playlist', id: 'LIST' }];
+      }
+      return [
+        ...result.getPlaylists.map(({ id }) => ({ type: 'Playlist', id })),
+        { type: 'Playlist', id: 'LIST' },
+      ];
+    },
+  }),
+  getFiles: builder.query({
+    query: () => ({
+      document: `
+        query getFiles {
+          getFiles {
+            id
+            originalname
+            artist
+            url
+          }
+        }
+      `,
+    }),
+    providesTags: (result) =>
+      result && result.getFiles
+        ? [
+            ...result.getFiles.map(({ id }) => ({ type: 'File', id })),
+            { type: 'File', id: 'LIST' },
+          ]
+        : [{ type: 'File', id: 'LIST' }],
+  }),  
 })
 });
 
