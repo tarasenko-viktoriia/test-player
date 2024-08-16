@@ -45,24 +45,22 @@ function Player() {
         try {
           const baseURL = 'http://localhost:4000';
           const trackURL = `${baseURL}${currentTrack.url}`;
-          
-          // Зупиняємо відтворення, скидаємо позицію і встановлюємо новий трек
-          audio.pause();
-          audio.currentTime = 0; // Скидаємо позицію відтворення
-          audio.src = trackURL; // Встановлюємо новий трек
-          audio.load(); // Загружаємо трек
 
-          // Відтворюємо через 150 мс
-          setTimeout(() => {
-            if (isPlaying) {
+          if (audio.src !== trackURL) {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.src = trackURL;
+            audio.load();
+          }
+
+          if (isPlaying) {
+            setTimeout(() => {
               const playPromise = audio.play();
               if (playPromise !== undefined) {
-                playPromise
-                  .catch(() => {})
-                  .finally(() => {}); // Додаємо обробку помилок
+                playPromise.catch(() => {});
               }
-            }
-          }, 150);
+            }, 150);
+          }
         } catch (error) {
           console.error('Error playing audio:', error);
         }

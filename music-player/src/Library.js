@@ -35,12 +35,11 @@ function Library({ updateTrackInfo, searchQuery }) {
     if (currentTrack && currentTrack.url === track.url) {
       dispatch(togglePlayPause());
     } else {
-      dispatch(pause());
+      dispatch(pause()); 
       dispatch(setTrack({ track, index, context: 'library', playlist: null }));
-      dispatch(play());
+      dispatch(play()); 
     }
   };
-
   const handleClickOpenAdd = (track) => {
     setSelectedTrack(track);
     setOpenAdd(true);
