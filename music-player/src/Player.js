@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { play, pause, nextTrack, prevTrack, setTrackProgress, toggleShuffle, setNormalMode } from './playerSlice';
+import { play, pause, setTrackProgress, toggleShuffle, setNormalMode, nextTrack, previousTrack } from './playerSlice';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -39,33 +39,56 @@ function Player() {
 
   useEffect(() => {
     const audio = audioRef.current;
-  
-    if (currentTrack && currentTrack.url) {
-      const baseURL = 'http://localhost:4000'; 
-      const trackURL = `${baseURL}${currentTrack.url}`;
-      
-      audio.pause();
-      audio.src = trackURL;
-  
-      if (isPlaying) {
-        audio.play().catch((error) => {
+
+    const loadAndPlayTrack = async () => {
+      if (currentTrack && currentTrack.url) {
+        try {
+          const baseURL = 'http://localhost:4000';
+          const trackURL = `${baseURL}${currentTrack.url}`;
+          
+          // Зупиняємо відтворення, скидаємо позицію і встановлюємо новий трек
+          audio.pause();
+          audio.currentTime = 0; // Скидаємо позицію відтворення
+          audio.src = trackURL; // Встановлюємо новий трек
+          audio.load(); // Загружаємо трек
+
+          // Відтворюємо через 150 мс
+          setTimeout(() => {
+            if (isPlaying) {
+              const playPromise = audio.play();
+              if (playPromise !== undefined) {
+                playPromise
+                  .catch(() => {})
+                  .finally(() => {}); // Додаємо обробку помилок
+              }
+            }
+          }, 150);
+        } catch (error) {
           console.error('Error playing audio:', error);
-        });
+        }
       }
-    }
+    };
+
+    loadAndPlayTrack();
   }, [currentTrack, isPlaying]);
 
   const handlePlayPause = () => {
     const audio = audioRef.current;
-  
-    if (audio.paused && currentTrack && currentTrack.url) {
-      audio.play().catch((error) => {
-        console.error('Error playing audio:', error);
-      });
-      dispatch(play()); 
+
+    if (audio.paused) {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            dispatch(play());
+          })
+          .catch((error) => {
+            console.error('Error playing audio:', error);
+          });
+      }
     } else {
       audio.pause();
-      dispatch(pause()); 
+      dispatch(pause());
     }
   };
 
@@ -73,8 +96,8 @@ function Player() {
     dispatch(nextTrack());
   };
 
-  const handlePrevTrack = () => {
-    dispatch(prevTrack());
+  const handlePreviousTrack = () => {
+    dispatch(previousTrack());
   };
 
   const handleProgressChange = (e) => {
@@ -108,18 +131,18 @@ function Player() {
 
   const toggleVolumeControl = () => {
     setShowVolumeControl(!showVolumeControl);
-};
+  };
 
   return (
     <div>
       {currentTrack ? (
         <div className='player'>
-          <div >
-            <img className={isPlaying ? 'spin' : ''} src='../image/player-image.png' width="100px"></img>
+          <div>
+            <img className={isPlaying ? 'spin' : ''} src='../image/player-image.png' width="100px" alt="Player" />
           </div>
           <div className='track-id3'>
-            <h2> {currentTrack.originalname}</h2>
-            <h3> {currentTrack.artist || 'Unknown Artist '}</h3>
+            <h2>{currentTrack.originalname}</h2>
+            <h3>{currentTrack.artist || 'Unknown Artist'}</h3>
           </div>
           <div className="player-controls-container">
             <div className="volume-control-wrapper">
@@ -152,11 +175,11 @@ function Player() {
             <span>{formatTime(duration)}</span>
           </div>
           <div className='player-control'>
-            <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'white': ' #8A7BAA'  }} />
-            <ArrowBackIosIcon onClick={handlePrevTrack} />
+            <ShuffleIcon onClick={handleShuffleToggle} style={{ color: isShuffle ? 'white' : '#8A7BAA' }} />
+            <ArrowBackIosIcon onClick={handlePreviousTrack} />
             <div onClick={handlePlayPause}>{isPlaying ? <PauseIcon /> : <PlayArrowIcon />}</div>
             <ArrowForwardIosIcon onClick={handleNextTrack} />
-            <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'white': ' #8A7BAA'  }} />
+            <RepeatIcon onClick={handleNormalMode} style={{ color: !isShuffle ? 'white' : '#8A7BAA' }} />
           </div>
         </div>
       ) : (
