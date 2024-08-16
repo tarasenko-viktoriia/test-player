@@ -16,7 +16,7 @@ const ShowLogin = () => {
 
   return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-          {isLoggedIn && (
+          {isLoggedIn ? (
               <>
                   <img
                       src={avatarUrl || '../../logo.png'}
@@ -26,16 +26,15 @@ const ShowLogin = () => {
                   />
                   <div>
                       <div>Hi, {login}!</div>
-                      {isLoggedIn && (
-                          <div className='nick-container'>Nickname: {nick}</div>
-                      )}
+                      <div className='nick-container'>Nickname: {nick}</div>
                   </div>
               </>
+          ) : (
+              <div>Hi, Anon!</div>
           )}
       </div>
   );
 }
-
 
 const Logout = () => {
   const dispatch = useDispatch();
