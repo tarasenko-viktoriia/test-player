@@ -57,15 +57,22 @@ const RegisterForm = ({ onClose }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-
+  
   const handleRegister = async () => {
     try {
-      const result = await dispatch(api.endpoints.registerUser.initiate({ login, password })).unwrap();
-      if (result?.createUser) {
-        onClose(); 
+      const registerResult = await dispatch(api.endpoints.registerUser.initiate({ login, password })).unwrap();
+
+      if (registerResult?.createUser) {
+        const loginResult = await dispatch(actionFullLogin({ login, password })).unwrap();
+        
+        if (loginResult?.token) {
+          onClose();
+        } else {
+          console.error('Login failed');
+        }
       }
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Registration or login failed:', error);
     }
   };
 
