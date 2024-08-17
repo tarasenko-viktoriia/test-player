@@ -231,7 +231,7 @@ const Header = ({ onLoginClick, onRegisterClick, onProfileClick }) => {
   );
 };
 
-const App = () => {
+const Login = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -291,4 +291,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Login;
