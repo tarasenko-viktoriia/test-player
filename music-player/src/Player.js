@@ -186,7 +186,7 @@ function Player() {
           </div>
         </div>
       ) : (
-        <h2>No track selected</h2>
+        <h2 style={{textAlign: "center", color:"rgb(150, 133, 173)"}}>No track selected</h2>
       )}
     </div>
   );
