@@ -24,49 +24,54 @@ function Player() {
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
     };
+
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
 
+    const handleEnded = () => {
+      dispatch(nextTrack()); 
+    };
+
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const audio = audioRef.current;
-
+  
     const loadAndPlayTrack = async () => {
       if (currentTrack && currentTrack.url) {
         try {
           const baseURL = 'http://localhost:4000';
           const trackURL = `${baseURL}${currentTrack.url}`;
-
+  
           if (audio.src !== trackURL) {
             audio.pause();
             audio.currentTime = 0;
             audio.src = trackURL;
-            audio.load();
+            await audio.load();
           }
-
+  
           if (isPlaying) {
-            setTimeout(() => {
-              const playPromise = audio.play();
-              if (playPromise !== undefined) {
-                playPromise.catch(() => {});
-              }
-            }, 150);
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+              playPromise.catch((error) => console.error('Error playing audio:', error));
+            }
           }
         } catch (error) {
-          console.error('Error playing audio:', error);
+          console.error('Error loading or playing audio:', error);
         }
       }
     };
-
+  
     loadAndPlayTrack();
   }, [currentTrack, isPlaying]);
 

@@ -3,11 +3,11 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   currentTrack: null,
   isPlaying: false,
-  library: [], 
+  library: [],
   playlists: [],
-  currentIndex: -1,
+  currentIndex: 0, 
   currentContext: 'library', 
-  currentPlaylist: null,
+  currentPlaylist: null, 
   trackProgress: 0, 
   isShuffle: false, 
 };
@@ -50,28 +50,41 @@ const playerSlice = createSlice({
       state.library = state.library.filter(track => track.id !== action.payload);
     },
     nextTrack: (state) => {
-      const tracks = state.currentContext === 'library' ? state.library : (state.currentPlaylist?.tracks || []);
-      if (tracks.length > 0) {
+      const trackList = state.currentContext === 'library' ? state.library : state.currentPlaylist?.tracks || [];
+      if (trackList.length > 0) {
         const nextIndex = state.isShuffle
-          ? Math.floor(Math.random() * tracks.length)
-          : (state.currentIndex + 1) % tracks.length;
-        state.currentTrack = tracks[nextIndex];
+          ? Math.floor(Math.random() * trackList.length)
+          : (state.currentIndex + 1) % trackList.length;
+        state.currentTrack = trackList[nextIndex];
         state.currentIndex = nextIndex;
       }
     },
     previousTrack: (state) => {
-      const tracks = state.currentContext === 'library' ? state.library : (state.currentPlaylist?.tracks || []);
-      if (tracks.length > 0) {
+      const trackList = state.currentContext === 'library' ? state.library : state.currentPlaylist?.tracks || [];
+      if (trackList.length > 0) {
         const prevIndex = state.isShuffle
-          ? Math.floor(Math.random() * tracks.length)
-          : (state.currentIndex - 1 + tracks.length) % tracks.length;
-        state.currentTrack = tracks[prevIndex];
+          ? Math.floor(Math.random() * trackList.length)
+          : (state.currentIndex - 1 + trackList.length) % trackList.length;
+        state.currentTrack = trackList[prevIndex];
         state.currentIndex = prevIndex;
       }
     },
   },
 });
 
-export const { setTrack, play, pause, setLibrary, setPlaylists, togglePlayPause, setTrackProgress, toggleShuffle, setNormalMode, removeTrack, nextTrack, previousTrack } = playerSlice.actions;
+export const {
+  setTrack,
+  play,
+  pause,
+  setLibrary,
+  setPlaylists,
+  togglePlayPause,
+  setTrackProgress,
+  toggleShuffle,
+  setNormalMode,
+  removeTrack,
+  nextTrack,
+  previousTrack,
+} = playerSlice.actions;
 
 export default playerSlice.reducer;
