@@ -291,17 +291,17 @@ const api = createApi({
         : [{ type: 'File', id: 'LIST' }],
   }),  
   updateTrack: builder.mutation({
-    query: ({ id, title, artist }) => ({
+    query: ({ id, originalname, artist }) => ({
       document: `
-        mutation updateTrack($id: ID!, $title: String!, $artist: String!) {
-          updateTrack(id: $id, title: $title, artist: $artist) {
+        mutation updateTrack($id: ID!, $originalname: String!, $artist: String!) {
+          updateTrack(id: $id, originalname: $originalname, artist: $artist) {
             id
-            title
+            originalname
             artist
           }
         }
       `,
-      variables: { id, title, artist },
+      variables: { id, originalname, artist },
     }),
     invalidatesTags: (result, error, { id }) => [{ type: 'Library', id }],
   }),

@@ -7,9 +7,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Select, MenuItem, TextField, IconButton } from '@mui/material';
-import { useDeleteTrackMutation, useGetPlaylistsQuery, useGetFilesQuery, useAddTracksToPlaylistMutation } from './store';
+import { useDeleteTrackMutation, useGetPlaylistsQuery, useGetFilesQuery, useAddTracksToPlaylistMutation, useUpdateTrackMutation } from './store';
 
-function Library({ updateTrackInfo, searchQuery }) {
+function Library({ searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [openAdd, setOpenAdd] = useState(false);
@@ -19,6 +19,7 @@ function Library({ updateTrackInfo, searchQuery }) {
   const [newTrackTitle, setNewTrackTitle] = useState('');
   const [newArtistName, setNewArtistName] = useState('');
   const [deleteTrack] = useDeleteTrackMutation();
+  const [updateTrack] = useUpdateTrackMutation();
   const { data: libraryData = {}, isLoading } = useGetFilesQuery();
   const { data: playlistsData = [], isLoading: isLoadingPlaylists } = useGetPlaylistsQuery();
   const [addTracksToPlaylist] = useAddTracksToPlaylistMutation();
@@ -40,6 +41,7 @@ function Library({ updateTrackInfo, searchQuery }) {
       dispatch(play()); 
     }
   };
+
   const handleClickOpenAdd = (track) => {
     setSelectedTrack(track);
     setOpenAdd(true);
@@ -65,13 +67,21 @@ function Library({ updateTrackInfo, searchQuery }) {
     setNewArtistName('');
   };
 
-  const handleUpdateTrackInfo = () => {
+  const handleUpdateTrackInfo = async () => {
     if (selectedTrack) {
-      updateTrackInfo(selectedTrack.url, newTrackTitle, newArtistName);
-      handleCloseEdit();
+      try {
+        await updateTrack({
+          id: selectedTrack.id,
+          originalname: newTrackTitle, 
+          artist: newArtistName,
+        }).unwrap();
+        refetch();
+        handleCloseEdit();
+      } catch (error) {
+        console.error('Failed to update track:', error);
+      }
     }
   };
-
   const handleDeleteTrack = async (trackId) => {
     try {
       await deleteTrack({ id: trackId }).unwrap();

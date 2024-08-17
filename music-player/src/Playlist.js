@@ -184,6 +184,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
               </span>
               <div className='track-info'>
                 <strong>{track.originalname}</strong>
+                <strong className='artist'>{track.artist || 'Unknown Artist'}</strong>
               </div>
               <div className='track-controls'>
                 <IconButton onClick={(e) => { e.stopPropagation(); handleRemoveTrack(selectedPlaylist.title, track.url); }}>
