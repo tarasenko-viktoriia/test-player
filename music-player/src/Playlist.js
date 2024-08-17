@@ -8,9 +8,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
-import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useGetPlaylistsQuery } from './store'; 
+import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTitleMutation, useGetPlaylistsQuery, useUpdateTrackMutation } from './store';
 
-function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
+function Playlist({ removeTrackFromPlaylist, searchQuery }) {
   const dispatch = useDispatch();
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [playlistTitle, setPlaylistTitle] = useState('');
@@ -23,22 +23,14 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
   const [newArtistName, setNewArtistName] = useState('');
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
-  const [addPlaylist, { data: newPlaylistData }] = useAddPlaylistMutation();
+  const [addPlaylist] = useAddPlaylistMutation();
   const [deletePlaylist] = useDeletePlaylistMutation();
   const [updatePlaylistTitle] = useUpdatePlaylistTitleMutation();
+  const [updateTrack] = useUpdateTrackMutation();
   
-  const { data: libraryData = {}, isLoading } = useGetPlaylistsQuery();
-  const { data: playlistsData = []} = useGetPlaylistsQuery();
+  const { data: playlistsData = [], isLoading } = useGetPlaylistsQuery();
 
-  const library = libraryData.getFiles || [];
   const playlists = playlistsData.getPlaylists || [];
-
-
-  useEffect(() => {
-    if (newPlaylistData) {
-      dispatch({ type: 'playlists/addPlaylist', payload: newPlaylistData.addPlaylist });
-    }
-  }, [newPlaylistData, dispatch]);
 
   const handleCreatePlaylist = async () => {
     await addPlaylist({ title: playlistTitle });
@@ -72,8 +64,8 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
 
   const handleClickOpenEdit = (track) => {
     setSelectedTrack(track);
-    setNewTrackTitle(track.title);
-    setNewArtistName(track.artist);
+    setNewTrackTitle(track.originalname);
+    setNewArtistName(track.artist || "Unknown Artist");
     setOpenEdit(true);
   };
 
@@ -84,10 +76,18 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     setNewArtistName('');
   };
 
-  const handleUpdateTrackInfo = () => {
+  const handleUpdateTrackInfo = async () => {
     if (selectedTrack) {
-      updateTrackInfo(selectedTrack.url, newTrackTitle, newArtistName);
-      handleCloseEdit();
+      try {
+        await updateTrack({
+          id: selectedTrack.id,
+          originalname: newTrackTitle, 
+          artist: newArtistName,
+        }).unwrap();
+        handleCloseEdit();
+      } catch (error) {
+        console.error('Failed to update track:', error);
+      }
     }
   };
 
@@ -114,7 +114,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     }
   };
 
-  const filteredPlaylists = playlistsData?.getPlaylists?.map((playlist) => ({
+  const filteredPlaylists = playlists.map((playlist) => ({
     ...playlist,
     tracks: playlist.files?.filter(
       (track) =>
@@ -126,26 +126,24 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
     <div style={{ width: '100%' }}>
       {!selectedPlaylist ? (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '18px', fontFamily:'Poppins'}}>
-              <div style={{fontWeight: '500'}}>My Playlists</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '18px', fontFamily: 'Poppins' }}>
+              <div style={{ fontWeight: '500' }}>My Playlists</div>
               <IconButton onClick={() => setOpenCreateDialog(true)}>
                 <AddIcon style={{ color: 'white', width: '40px', height: '40px' }} />
               </IconButton>
           </div>
           {filteredPlaylists.map((playlist, index) => (
             <div className='playlist' key={index} onClick={() => setSelectedPlaylist(playlist)}>
-            <div>
-              {playlist.title}
+              <div>{playlist.title}</div>
+              <div className='track-controls'>
+                <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEditPlaylistTitle(playlist); }}>
+                  <EditIcon style={{ color: 'white' }} />
+                </IconButton>
+                <IconButton onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.id); }}>
+                  <DeleteIcon style={{ color: 'white' }} />
+                </IconButton>
+              </div>
             </div>
-            <div className='track-controls'>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEditPlaylistTitle(playlist); }}>
-                <EditIcon style={{ color: 'white' }} />
-              </IconButton>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.id); }}>
-                <DeleteIcon style={{ color: 'white' }} />
-              </IconButton>
-            </div>
-          </div>
           ))}
 
           <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
@@ -170,7 +168,7 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
         </>
       ) : (
         <div className='playlist-container'>
-          <div style={{ display: "flex", gap: "20px", alignItems:"center", paddingBottom:"20px" }}>
+          <div style={{ display: "flex", gap: "20px", alignItems: "center", paddingBottom: "20px" }}>
             <ArrowBackIcon onClick={() => setSelectedPlaylist(null)} />
             <h3>{selectedPlaylist.title}</h3>
           </div>
@@ -196,51 +194,52 @@ function Playlist({ removeTrackFromPlaylist, updateTrackInfo, searchQuery }) {
               </div>
             </div>
           ))}
-          <Dialog open={openEdit} onClose={handleCloseEdit}>
-            <DialogTitle>Edit Track Info</DialogTitle>
-            <DialogContent>
-              <TextField
-                margin="dense"
-                label="Track Title"
-                type="text"
-                fullWidth
-                value={newTrackTitle}
-                onChange={(e) => setNewTrackTitle(e.target.value)}
-              />
-              <TextField
-                margin="dense"
-                label="Artist Name"
-                type="text"
-                fullWidth
-                value={newArtistName}
-                onChange={(e) => setNewArtistName(e.target.value)}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseEdit}>Cancel</Button>
-              <Button onClick={handleUpdateTrackInfo} color="primary">Save</Button>
-            </DialogActions>
-          </Dialog>
-
-          <Dialog open={openEditPlaylistTitle} onClose={handleCloseEditPlaylistTitle}>
-            <DialogTitle>Edit Playlist Title</DialogTitle>
-            <DialogContent>
-              <TextField
-                margin="dense"
-                label="Playlist Title"
-                type="text"
-                fullWidth
-                value={newPlaylistTitle}
-                onChange={(e) => setNewPlaylistTitle(e.target.value)}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseEditPlaylistTitle}>Cancel</Button>
-              <Button onClick={handleUpdatePlaylistTitle} color="primary">Save</Button>
-            </DialogActions>
-          </Dialog>
         </div>
       )}
+
+      <Dialog open={openEdit} onClose={handleCloseEdit}>
+        <DialogTitle>Edit Track Information</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Track Title"
+            type="text"
+            fullWidth
+            value={newTrackTitle}
+            onChange={(e) => setNewTrackTitle(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Artist"
+            type="text"
+            fullWidth
+            value={newArtistName}
+            onChange={(e) => setNewArtistName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEdit}>Cancel</Button>
+          <Button onClick={handleUpdateTrackInfo} color="primary">Update</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openEditPlaylistTitle} onClose={handleCloseEditPlaylistTitle}>
+        <DialogTitle>Edit Playlist Title</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Playlist Title"
+            type="text"
+            fullWidth
+            value={newPlaylistTitle}
+            onChange={(e) => setNewPlaylistTitle(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditPlaylistTitle}>Cancel</Button>
+          <Button onClick={handleUpdatePlaylistTitle} color="primary">Update</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
