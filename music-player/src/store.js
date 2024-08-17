@@ -58,7 +58,6 @@ const api = createApi({
               id
               login
               nick
-              avatar
             }
           }
         `,
@@ -82,23 +81,21 @@ const api = createApi({
     registerUser: builder.mutation({
       query: ({ login, password }) => ({
         document: `
-        mutation register($login: String!, $password: String!) {
-          register(login: $login, password: $password) {
-            id
-            login
-            nick
+          mutation register($login: String!, $password: String!) {
+            register(login: $login, password: $password) {
+              id
+              login
+              nick
+            }
           }
-        }
         `,
         variables: { login, password },
       }),
       async onQueryStarted({ login, password }, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
-          console.log('Registration result:', result);
-          if (result.data && result.data.createUser) {
+          if (result.data && result.data.register) {
             const loginResult = await dispatch(api.endpoints.login.initiate({ login, password })).unwrap();
-            console.log('Login result:', loginResult);
             if (loginResult?.login) {
               dispatch(registerSuccess(loginResult.login));
               await dispatch(actionAboutMe());

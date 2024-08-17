@@ -57,22 +57,24 @@ const RegisterForm = ({ onClose }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-  
+
   const handleRegister = async () => {
     try {
       const registerResult = await dispatch(api.endpoints.registerUser.initiate({ login, password })).unwrap();
-
+      
       if (registerResult?.createUser) {
         const loginResult = await dispatch(actionFullLogin({ login, password })).unwrap();
         
         if (loginResult?.token) {
-          onClose();
+          onClose(); 
         } else {
           console.error('Login failed');
+          onClose(); 
         }
       }
     } catch (error) {
       console.error('Registration or login failed:', error);
+      onClose(); 
     }
   };
 
@@ -100,6 +102,8 @@ const RegisterForm = ({ onClose }) => {
   );
 };
 
+
+
 const ProfileModal = ({ onClose }) => {
   const [nick, setNick] = useState('');
   const [avatar, setAvatar] = useState(null);
@@ -115,11 +119,11 @@ const ProfileModal = ({ onClose }) => {
 
   const handleUpload = async () => {
     let avatarUrl = '';
-
+  
     if (avatar) {
       const formData = new FormData();
       formData.append('file', avatar);
-
+  
       try {
         const response = await fetch('http://localhost:4000/upload', {
           method: 'POST',
@@ -128,9 +132,9 @@ const ProfileModal = ({ onClose }) => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-
+  
         const data = await response.json();
-
+  
         if (data?.url) {
           avatarUrl = data.url;
           const result = await uploadAvatar({ avatarId: data.id }).unwrap();
@@ -142,7 +146,7 @@ const ProfileModal = ({ onClose }) => {
         console.error('Error uploading avatar:', error);
       }
     }
-
+  
     if (nick) {
       try {
         const result = await setUserNick({ id: userId, nick }).unwrap();
@@ -153,7 +157,7 @@ const ProfileModal = ({ onClose }) => {
         console.error('Error updating nickname:', error);
       }
     }
-
+  
     onClose();
   };
 
@@ -242,6 +246,11 @@ const Login = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
