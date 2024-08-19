@@ -28,6 +28,9 @@ const playerSlice = createSlice({
     pause: (state) => {
       state.isPlaying = false;
     },
+    togglePlayPause: (state) => {
+      state.isPlaying = !state.isPlaying;
+    },
     nextTrack: (state) => {
       const trackList = state.currentContext === 'library' 
         ? state.currentPlaylist.tracks 
@@ -57,9 +60,6 @@ const playerSlice = createSlice({
     },
     setPlaylists: (state, action) => {
       state.playlists = action.payload;
-    },
-    togglePlayPause: (state) => {
-      state.isPlaying = !state.isPlaying;
     },
     setTrackProgress: (state, action) => {
       state.trackProgress = action.payload;

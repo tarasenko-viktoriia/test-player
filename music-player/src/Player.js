@@ -65,6 +65,8 @@ function Player() {
             if (playPromise !== undefined) {
               playPromise.catch((error) => console.error('Error playing audio:', error));
             }
+          } else {
+            audio.pause(); 
           }
         } catch (error) {
           console.error('Error loading or playing audio:', error);
@@ -74,16 +76,17 @@ function Player() {
   
     loadAndPlayTrack();
   }, [currentTrack, isPlaying]);
+  
 
   const handlePlayPause = () => {
     const audio = audioRef.current;
-
+  
     if (audio.paused) {
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            dispatch(play());
+            dispatch(play()); 
           })
           .catch((error) => {
             console.error('Error playing audio:', error);
@@ -91,9 +94,10 @@ function Player() {
       }
     } else {
       audio.pause();
-      dispatch(pause());
+      dispatch(pause()); 
     }
   };
+  
 
   const handleNextTrack = () => {
     dispatch(nextTrack());

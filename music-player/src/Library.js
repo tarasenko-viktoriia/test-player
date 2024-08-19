@@ -34,7 +34,11 @@ function Library({ searchQuery }) {
 
   const handlePlayPause = (track, index) => {
     if (currentTrack && currentTrack.url === track.url) {
-      dispatch(togglePlayPause());
+      if (isPlaying) {
+        dispatch(pause());
+      } else {
+        dispatch(play());
+      }
     } else {
       dispatch(pause()); 
       dispatch(setTrack({ 
@@ -46,6 +50,7 @@ function Library({ searchQuery }) {
       dispatch(play()); 
     }
   };
+  
 
   const handleClickOpenAdd = (track) => {
     setSelectedTrack(track);
