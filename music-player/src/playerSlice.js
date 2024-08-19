@@ -28,6 +28,30 @@ const playerSlice = createSlice({
     pause: (state) => {
       state.isPlaying = false;
     },
+    nextTrack: (state) => {
+      const trackList = state.currentContext === 'library' 
+        ? state.currentPlaylist.tracks 
+        : state.currentPlaylist?.tracks || [];
+      if (trackList.length > 0) {
+        const nextIndex = state.isShuffle
+          ? Math.floor(Math.random() * trackList.length)
+          : (state.currentIndex + 1) % trackList.length;
+        state.currentTrack = trackList[nextIndex];
+        state.currentIndex = nextIndex;
+      }
+    },
+    previousTrack: (state) => {
+      const trackList = state.currentContext === 'library' 
+        ? state.currentPlaylist.tracks 
+        : state.currentPlaylist?.tracks || [];
+      if (trackList.length > 0) {
+        const prevIndex = state.isShuffle
+          ? Math.floor(Math.random() * trackList.length)
+          : (state.currentIndex - 1 + trackList.length) % trackList.length;
+        state.currentTrack = trackList[prevIndex];
+        state.currentIndex = prevIndex;
+      }
+    },
     setLibrary: (state, action) => {
       state.library = action.payload;
     },
@@ -48,26 +72,6 @@ const playerSlice = createSlice({
     },
     removeTrack: (state, action) => {
       state.library = state.library.filter(track => track.id !== action.payload);
-    },
-    nextTrack: (state) => {
-      const trackList = state.currentContext === 'library' ? state.library : state.currentPlaylist?.tracks || [];
-      if (trackList.length > 0) {
-        const nextIndex = state.isShuffle
-          ? Math.floor(Math.random() * trackList.length)
-          : (state.currentIndex + 1) % trackList.length;
-        state.currentTrack = trackList[nextIndex];
-        state.currentIndex = nextIndex;
-      }
-    },
-    previousTrack: (state) => {
-      const trackList = state.currentContext === 'library' ? state.library : state.currentPlaylist?.tracks || [];
-      if (trackList.length > 0) {
-        const prevIndex = state.isShuffle
-          ? Math.floor(Math.random() * trackList.length)
-          : (state.currentIndex - 1 + trackList.length) % trackList.length;
-        state.currentTrack = trackList[prevIndex];
-        state.currentIndex = prevIndex;
-      }
     },
   },
 });

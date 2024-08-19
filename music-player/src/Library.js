@@ -37,7 +37,12 @@ function Library({ searchQuery }) {
       dispatch(togglePlayPause());
     } else {
       dispatch(pause()); 
-      dispatch(setTrack({ track, index, context: 'library', playlist: null }));
+      dispatch(setTrack({ 
+        track, 
+        index, 
+        context: 'library', 
+        playlist: { title: 'Library', tracks: filteredLibrary }
+      }));
       dispatch(play()); 
     }
   };
