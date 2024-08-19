@@ -5,15 +5,15 @@ import Library from './Library';
 import Playlist from './Playlist';
 import TrackUploader from './TrackUploader';
 import Player from './Player';
-import { setLibrary, setPlaylists, setTrack } from './playerSlice';
 import Login from './Login';
+import { setLibrary, setPlaylists, setTrack } from './playerSlice';
+import { useGetFilesQuery } from './store';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
-import { useGetFilesQuery} from './store';
 
 function App() {
   const [library, setLibraryState] = useState([]);
   const [playlists, setPlaylistsState] = useState([]);
-  const [activeTab, setActiveTab] = useState('library');
   const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
   const currentTrack = useSelector((state) => state.player.currentTrack);
@@ -26,7 +26,6 @@ function App() {
   useEffect(() => {
     dispatch(setPlaylists(playlists));
   }, [playlists, dispatch]);
-
 
   const removeTrackFromPlaylist = (playlistTitle, trackUrl) => {
     setPlaylistsState((prevPlaylists) => {
@@ -79,61 +78,74 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className="app">
-        <div className="sidebar-wrapper-left">
-          <div className='sidebar-left'>
-            <div className='logo-container'>
-              <img src="../logo.png" alt="Logo"></img>
-              <p>Bits</p>
-            </div>
-            <div className='sidebar-left-item' onClick={() => setActiveTab('library')}>
-              <img src="./image/music.png" alt="Frame 1" />
-                My Library
-            </div>
-            <div className='sidebar-left-item' onClick={() => setActiveTab('playlists')}>
-              <img src="./image/playlist.png" alt="Frame 2" />
-                Playlists
+      <Router>
+        <div className="app">
+          <div className="sidebar-wrapper-left">
+            <div className='sidebar-left'>
+              <div className='logo-container'>
+                <img src="../logo.png" alt="Logo"></img>
+                <p>Bits</p>
+              </div>
+              <div className='sidebar-left-item'>
+                <Link to="/library">
+                  <img src="./image/music.png" alt="Frame 1" />
+                  My Library
+                </Link>
+              </div>
+              <div className='sidebar-left-item'>
+                <Link to="/playlists">
+                  <img src="./image/playlist.png" alt="Frame 2" />
+                  Playlists
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="main-container">
-          <div className="hero-container">
-            <div className="input-container">
-              <input
-                className="search-input"
-                type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder="Search"
-              />
-            </div>
-            {activeTab === 'library' ? (
-              <>
-                <Library
-                  library={library}
-                  updateTrackInfo={updateTrackInfo}
-                  playlists={playlists}
-                  searchQuery={searchQuery}
+          <div className="main-container">
+            <div className="hero-container">
+              <div className="input-container">
+                <input
+                  className="search-input"
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Search"
                 />
-              </>
-            ) : (
-              <Playlist
-                playlists={playlists}
-                removeTrackFromPlaylist={removeTrackFromPlaylist}
-                updateTrackInfo={updateTrackInfo}
-                searchQuery={searchQuery}
-              />
-            )}
+              </div>
+              <Routes>
+                <Route 
+                  path="/library" 
+                  element={
+                    <Library
+                      library={library}
+                      updateTrackInfo={updateTrackInfo}
+                      playlists={playlists}
+                      searchQuery={searchQuery}
+                    />
+                  } 
+                />
+                <Route 
+                  path="/playlists" 
+                  element={
+                    <Playlist
+                      playlists={playlists}
+                      removeTrackFromPlaylist={removeTrackFromPlaylist}
+                      updateTrackInfo={updateTrackInfo}
+                      searchQuery={searchQuery}
+                    />
+                  } 
+                />
+              </Routes>
+            </div>
+          </div>
+          <div className="sidebar-wrapper-right">
+            <div className='sidebar-right'>
+              <Login/>
+              <Player />
+              <TrackUploader className="dropzone" onTrackUploaded={handleTrackUploaded} />
+            </div>
           </div>
         </div>
-        <div className="sidebar-wrapper-right">
-          <div className='sidebar-right'>
-            <Login/>
-            <Player />
-            <TrackUploader className="dropzone" onTrackUploaded={handleTrackUploaded} />
-          </div>
-        </div>
-      </div>
+      </Router>
     </Provider>
   );
 }
