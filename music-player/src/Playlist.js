@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom'; // Додаємо ці хуки
+import { useNavigate, useParams } from 'react-router-dom'; 
 import { setTrack, play, pause, togglePlayPause } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,8 +13,8 @@ import { useAddPlaylistMutation, useDeletePlaylistMutation, useUpdatePlaylistTit
 
 function Playlist({ removeTrackFromPlaylist, searchQuery }) {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Для навігації
-  const { playlistId } = useParams(); // Для отримання ID з URL
+  const navigate = useNavigate(); 
+  const { playlistId } = useParams(); 
   const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [playlistTitle, setPlaylistTitle] = useState('');
   const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
@@ -44,7 +44,7 @@ function Playlist({ removeTrackFromPlaylist, searchQuery }) {
     await deletePlaylist({ id: playlistId });
     dispatch({ type: 'playlists/removePlaylist', payload: playlistId });
     setSelectedPlaylist(null);
-    navigate('/playlists'); // Повернення до списку плейлистів
+    navigate('/playlists');
   };
 
   const handlePlayPause = (track, index, playlist) => {
