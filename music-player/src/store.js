@@ -190,6 +190,24 @@ const api = createApi({
       }),
       invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
     }),
+    removeTrackFromPlaylist: builder.mutation({
+      query: ({ playlistId, fileIds}) => ({
+        document: `
+          mutation removeTrackFromPlaylist($playlistId: ID!, $fileIds: [ID!]!) {
+            removeTrackFromPlaylist(playlistId: $playlistId, fileIds: $fileIds) {
+              id
+              title
+              files {
+                id
+                originalname
+              }
+            }
+          }
+        `,
+        variables: { playlistId, fileIds },
+      }),
+      invalidatesTags: [{ type: 'Playlist', id: 'LIST' }],
+    }),
   deleteFile: builder.mutation({
       query: ({ id }) => ({
           document: `
@@ -299,7 +317,8 @@ export const {
   useGetFilesQuery, 
   useDeleteFileMutation, 
   useUploadFileMutation,
-  useUpdateTrackMutation
+  useUpdateTrackMutation,
+  useRemoveTrackFromPlaylistMutation
 } = api;
 
 const store = configureStore({
