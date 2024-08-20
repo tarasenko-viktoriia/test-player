@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSelector, useDispatch} from 'react-redux';
-import { login, logout, registerSuccess, setProfile } from "./authSlice";
-import { api, store, actionFullLogin, useUploadAvatarMutation, useSetUserNickMutation } from "./store";
+import { logout, setProfile } from "./authSlice";
+import { api, actionFullLogin, useSetUserNickMutation } from "./store";
 
 const ShowLogin = () => {
   const login = useSelector((state) => state.auth.payload?.sub?.login || 'Anon');
@@ -102,50 +102,13 @@ const RegisterForm = ({ onClose }) => {
   );
 };
 
-
-
 const ProfileModal = ({ onClose }) => {
   const [nick, setNick] = useState('');
-  const [avatar, setAvatar] = useState(null);
-  const [uploadAvatar] = useUploadAvatarMutation();
   const [setUserNick] = useSetUserNickMutation();
   const userId = useSelector((state) => state.auth.payload?.sub?.id);
   const dispatch = useDispatch();
-  const authToken = useSelector((state) => state.auth.token);
-
-  const handleFileChange = (e) => {
-    setAvatar(e.target.files[0]);
-  };
 
   const handleUpload = async () => {
-    let avatarUrl = '';
-  
-    if (avatar) {
-      const formData = new FormData();
-      formData.append('file', avatar);
-  
-      try {
-        const response = await fetch('http://localhost:4000/upload', {
-          method: 'POST',
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-  
-        const data = await response.json();
-  
-        if (data?.url) {
-          avatarUrl = data.url;
-          const result = await uploadAvatar({ avatarId: data.id }).unwrap();
-          if (result?.setAvatar?.avatars?.length > 0) {
-            dispatch(setProfile({ avatar: result.setAvatar.avatars[0] }));
-          }
-        }
-      } catch (error) {
-        console.error('Error uploading avatar:', error);
-      }
-    }
   
     if (nick) {
       try {
@@ -171,13 +134,9 @@ const ProfileModal = ({ onClose }) => {
         fullWidth
         margin="normal"
       />
-      <input
-        type="file"
-        onChange={handleFileChange}
-      />
       <Button
         onClick={handleUpload}
-        disabled={!nick && !avatar}
+        disabled={!nick}
         variant="contained"
         color="primary"
       >
@@ -221,7 +180,7 @@ const LoginForm = ({ onClose }) => {
   );
 };
 
-const Header = ({ onLoginClick, onRegisterClick, onProfileClick }) => {
+const Header = ({ onLoginClick, onProfileClick }) => {
   const isLoggedIn = useSelector((state) => state.auth.token);
 
   return (
@@ -246,11 +205,6 @@ const Login = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);

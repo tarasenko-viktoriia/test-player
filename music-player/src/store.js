@@ -104,22 +104,6 @@ const api = createApi({
         }
       },
     }),
-    uploadAvatar: builder.mutation({
-      query: ({ avatarId }) => ({
-        document: `
-          mutation setAvatar($avatarId: ID!) {
-            setAvatar(avatarId: $avatarId) {
-              id
-              avatars {
-                url
-              }
-            }
-          }
-        `,
-        variables: { avatarId }, 
-      }),
-      invalidatesTags: (result, error, { _id }) => [{ type: 'User', id: _id }],
-    }),
     addPlaylist: builder.mutation({
       query: ({ title, fileIds }) => ({
           document: `
@@ -303,7 +287,7 @@ const api = createApi({
 })
 });
 
-export const { useUploadAvatarMutation, 
+export const {
   useSetUserNickMutation, 
   useAddPlaylistMutation, 
   useDeletePlaylistMutation, 

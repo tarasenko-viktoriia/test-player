@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setTrack, play, pause, togglePlayPause, removeTrack } from './playerSlice';
+import { setTrack, play, pause, removeTrack } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';

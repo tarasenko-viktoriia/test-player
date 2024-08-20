@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTrack, play, pause, togglePlayPause } from './playerSlice';
 import AddIcon from '@mui/icons-material/Add';
@@ -28,7 +28,7 @@ function Playlist({ removeTrackFromPlaylist, searchQuery }) {
   const [updatePlaylistTitle] = useUpdatePlaylistTitleMutation();
   const [updateTrack] = useUpdateTrackMutation();
   
-  const { data: playlistsData = [], isLoading } = useGetPlaylistsQuery();
+  const { data: playlistsData = [] } = useGetPlaylistsQuery();
 
   const playlists = playlistsData.getPlaylists || [];
 
