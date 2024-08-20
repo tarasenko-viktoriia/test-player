@@ -184,8 +184,6 @@ function Playlist({ removeTrackFromPlaylist, searchQuery }) {
             ))}
           </div>
         )}
-    
-        {/* Dialog для редагування інформації про трек */}
         <Dialog open={openEdit} onClose={handleCloseEdit}>
           <DialogTitle>Edit Track Information</DialogTitle>
           <DialogContent>
@@ -211,8 +209,6 @@ function Playlist({ removeTrackFromPlaylist, searchQuery }) {
             <Button onClick={handleUpdateTrackInfo} color="primary">Update</Button>
           </DialogActions>
         </Dialog>
-    
-        {/* Dialog для створення нового плейлиста */}
         <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
           <DialogTitle>Create New Playlist</DialogTitle>
           <DialogContent>
@@ -230,8 +226,6 @@ function Playlist({ removeTrackFromPlaylist, searchQuery }) {
             <Button onClick={handleCreatePlaylist} color="primary">Create</Button>
           </DialogActions>
         </Dialog>
-    
-        {/* Dialog для редагування заголовка плейлиста */}
         <Dialog open={openEditPlaylistTitle} onClose={handleCloseEditPlaylistTitle}>
           <DialogTitle>Edit Playlist Title</DialogTitle>
           <DialogContent>
