@@ -87,14 +87,18 @@ function App() {
                 <p>Bits</p>
               </div>
               <div className='sidebar-left-item'>
-                <Link to="/library">
+                <div>
                   <img src="./image/music.png" alt="Frame 1" />
+                </div>
+                <Link to="/library">
                   My Library
                 </Link>
               </div>
               <div className='sidebar-left-item'>
+                <div>
+                  <img src="./image/playlist.png" alt="Playlists" />
+                </div>
                 <Link to="/playlists">
-                  <img src="./image/playlist.png" alt="Frame 2" />
                   Playlists
                 </Link>
               </div>
@@ -134,6 +138,10 @@ function App() {
                     />
                   } 
                 />
+                <Route path="/playlists/:playlistId" element={<Playlist playlists={playlists}
+                      removeTrackFromPlaylist={removeTrackFromPlaylist}
+                      updateTrackInfo={updateTrackInfo}
+                      searchQuery={searchQuery}/>} />
               </Routes>
             </div>
           </div>
